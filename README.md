@@ -27,7 +27,7 @@ block groups for `dec2024` and on households for `oct2026`.
 
 ```
 scripts/stata/        scen9.do, scen15_mi.do, scen16_mi.do, population_truth_hhsub.do
-scripts/slurm/        run_stata_chunked.slurm, submit_scen15_16_mi.slurm, submit_coverage.slurm
+scripts/slurm/        run_stata_chunked.slurm, submit_coverage.slurm
 scripts/evaluation/   coverage_assessment.R
 data/estimates/       per-replicate coefficient CSVs (gitignored)   data/estimates/<pop>/<scen>/...
 data/summaries/       coverage summaries (gitignored)               data/summaries/<pop>/...
@@ -37,8 +37,18 @@ slurm_logs/           job logs (gitignored)
 
 ## Running
 
-All jobs bundle replicates into ~1-hour chunks (see the repo CLAUDE.md rules).
-**Smoke-test one replicate of each new code path before any full array.**
+One SLURM runner handles every scenario. Measure the seconds per replicate from a
+smoke test, pass it as `<avg_sec>`, and the runner bundles `ceil(3600/avg_sec)`
+replicates per job so each job is about an hour. Pick the array size as
+`NTASKS = ceil(N_REPS * avg_sec / 3600)`. **Smoke-test one replicate of each new
+code path before any full array.**
+
+Smoke test (one replicate, times it; `srun` is fine for the odd short job):
+
+```
+srun --ntasks=1 --cpus-per-task=1 --mem=2G --time=00:30:00 \
+  stata-se -b do scripts/stata/scen9.do 1 dec2024
+```
 
 Population truth (one short job per population):
 
@@ -47,20 +57,19 @@ srun --ntasks=1 --cpus-per-task=1 --mem=4G --time=00:30:00 \
   stata-se -b do scripts/stata/population_truth_hhsub.do dec2024
 ```
 
-scen9, e.g. dec2024 (1000 reps, 60 per task → 17 jobs):
+scen9, dec2024, ~30 s/rep → block 120, NTASKS = ceil(1000/120) = 9:
 
 ```
-sbatch --array=1-17 --job-name=scen9_dec2024 scripts/slurm/run_stata_chunked.slurm \
-  scen9 60 'data/estimates/dec2024/scen9/scen9_coef_{SIM}.csv' dec2024
+sbatch --array=1-9 --job-name=scen9_dec2024 scripts/slurm/run_stata_chunked.slurm \
+  scen9 30 'data/estimates/dec2024/scen9/scen9_coef_{SIM}.csv' dec2024
 ```
 
-scen15/scen16 all six arms on oct2026 (chunk 9 → C=112 tasks/arm → array 1-672):
+scen15/scen16 arms on oct2026 — one submit per arm (variant 1-3, scen15_mi/scen16_mi),
+e.g. ~400 s/rep → block 9, NTASKS = ceil(1000*400/3600) = 112:
 
 ```
-# smoke test first: replicate 1 of each arm
-MAX_REP=1 sbatch --array=1-6 --job-name=scen15_16_smoke scripts/slurm/submit_scen15_16_mi.slurm oct2026 1000
-# then the full run
-sbatch --array=1-672 --job-name=scen15_16_mi_oct2026 scripts/slurm/submit_scen15_16_mi.slurm oct2026 9
+sbatch --array=1-112 --job-name=scen15_v1_oct2026 scripts/slurm/run_stata_chunked.slurm \
+  scen15_mi 400 'data/estimates/oct2026/scen15_mi/v1/scen15_mi_coef_{SIM}.csv' 1 oct2026
 ```
 
 Coverage summaries (after estimates exist):
