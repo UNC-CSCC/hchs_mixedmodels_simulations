@@ -37,18 +37,16 @@ slurm_logs/           job logs (gitignored)
 
 ## Running
 
-One SLURM runner handles every scenario. Measure the seconds per replicate from a
-smoke test, pass it as `<avg_sec>`, and the runner bundles `ceil(3600/avg_sec)`
-replicates per job so each job is about an hour. Pick the array size as
-`NTASKS = ceil(N_REPS * avg_sec / 3600)`. **Smoke-test one replicate of each new
-code path before any full array.**
-
-Smoke test (one replicate, times it; `srun` is fine for the odd short job):
+Step 1 — time one replicate with `srun` (the odd short job is fine):
 
 ```
 srun --ntasks=1 --cpus-per-task=1 --mem=2G --time=00:30:00 \
   stata-se -b do scripts/stata/scen9.do 1 dec2024
 ```
+
+Step 2 — set `BLOCK` in `run_stata_chunked.slurm` so `BLOCK x seconds-per-rep` is
+about an hour, then submit with `--array=1-ceil(N_REPS/BLOCK)`. The runner skips
+replicates whose output already exists, so reruns are safe.
 
 Population truth (one short job per population):
 
@@ -57,19 +55,18 @@ srun --ntasks=1 --cpus-per-task=1 --mem=4G --time=00:30:00 \
   stata-se -b do scripts/stata/population_truth_hhsub.do dec2024
 ```
 
-scen9, dec2024, ~30 s/rep → block 120, NTASKS = ceil(1000/120) = 9:
+scen9, dec2024 (BLOCK 120 -> array 1-9 for 1000 reps):
 
 ```
 sbatch --array=1-9 --job-name=scen9_dec2024 scripts/slurm/run_stata_chunked.slurm \
-  scen9 30 'data/estimates/dec2024/scen9/scen9_coef_{SIM}.csv' dec2024
+  scen9 'data/estimates/dec2024/scen9/scen9_coef_{SIM}.csv' dec2024
 ```
 
-scen15/scen16 arms on oct2026 — one submit per arm (variant 1-3, scen15_mi/scen16_mi),
-e.g. ~400 s/rep → block 9, NTASKS = ceil(1000*400/3600) = 112:
+scen15/scen16 arms on oct2026 — one submit per arm (variant 1-3):
 
 ```
 sbatch --array=1-112 --job-name=scen15_v1_oct2026 scripts/slurm/run_stata_chunked.slurm \
-  scen15_mi 400 'data/estimates/oct2026/scen15_mi/v1/scen15_mi_coef_{SIM}.csv' 1 oct2026
+  scen15_mi 'data/estimates/oct2026/scen15_mi/v1/scen15_mi_coef_{SIM}.csv' 1 oct2026
 ```
 
 Coverage summaries (after estimates exist):
