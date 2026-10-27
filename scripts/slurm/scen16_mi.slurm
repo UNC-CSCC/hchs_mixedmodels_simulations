@@ -8,8 +8,6 @@
 #SBATCH --output=/work/users/a/q/aquijano/mixed_sims/hchs_mixedmodels_simulations/slurm_logs/%x_%A_%a.out
 #SBATCH --error=/work/users/a/q/aquijano/mixed_sims/hchs_mixedmodels_simulations/slurm_logs/%x_%A_%a.err
 
-# Measure one replicate with srun, set BLOCK so each job is ~1 hour, then
-# sbatch --array=1-<ceil(N_REPS/BLOCK)> scen16_mi.slurm <variant> <population>   (variant 1-3)
 set -u
 BLOCK=9
 N_REPS=1000
