@@ -3,7 +3,6 @@ slurm_logs/
 .statatmp/
 *.log
 
-# Simulation outputs (regenerable from the beibo samples)
+# Per-replicate estimates (regenerable)
 data/estimates/
-data/summaries/
 

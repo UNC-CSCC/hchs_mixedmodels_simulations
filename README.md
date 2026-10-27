@@ -57,7 +57,7 @@ scripts/
 data/
   population_coefficients/   truth, one CSV per population (tracked)
   estimates/<pop>/<scen>/    one CSV per replicate (not tracked)
-  summaries/<pop>/           coverage tables (not tracked)
+  summaries/<pop>/           coverage tables (tracked)
 ```
 
 ## Running
