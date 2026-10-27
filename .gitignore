@@ -7,4 +7,3 @@ slurm_logs/
 data/estimates/
 data/summaries/
 
-# Keep the population-truth CSVs tracked (data/population_coefficients/ is not ignored)
