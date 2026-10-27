@@ -13,21 +13,20 @@ BLOCK=9
 N_REPS=1000
 VARIANT="$1"; POP="$2"
 
-REPO="/work/users/a/q/aquijano/mixed_sims/hchs_mixedmodels_simulations"
-OUT_DIR="${REPO}/data/estimates/${POP}/scen15_mi/v${VARIANT}"
+OUT_DIR="${SLURM_SUBMIT_DIR}/data/estimates/${POP}/scen15_mi/v${VARIANT}"
 FIRST=$(( (SLURM_ARRAY_TASK_ID - 1) * BLOCK + 1 ))
 LAST=$(( SLURM_ARRAY_TASK_ID * BLOCK )); [ "$LAST" -gt "$N_REPS" ] && LAST="$N_REPS"
 
 module purge; module add stata/19
-export STATATMP="${REPO}/.statatmp"
+export STATATMP="${SLURM_SUBMIT_DIR}/.statatmp"
 WORK="${STATATMP}/${SLURM_ARRAY_JOB_ID}_${SLURM_ARRAY_TASK_ID}"
 mkdir -p "$WORK" "$OUT_DIR"; cd "$WORK"
 
 for SIM in $(seq "$FIRST" "$LAST"); do
     OUT="${OUT_DIR}/scen15_mi_coef_${SIM}.csv"
     [ -s "$OUT" ] && continue
-    timeout 120m stata-se -b do "${REPO}/scripts/stata/scen15_mi.do" "$SIM" "$VARIANT" "$POP"
+    timeout 120m stata-se -b do "${SLURM_SUBMIT_DIR}/scripts/stata/scen15_mi.do" "$SIM" "$VARIANT" "$POP"
     [ -s "$OUT" ] && echo "rep $SIM done" || echo "rep $SIM FAILED" >&2
 done
 
-cd "$REPO"; rm -rf "$WORK"
+cd "$SLURM_SUBMIT_DIR"; rm -rf "$WORK"
