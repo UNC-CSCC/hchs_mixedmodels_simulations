@@ -52,7 +52,7 @@ is fitted with scen9, and the results are pooled with Rubin's rules. scen15 uses
 ```
 scripts/
   stata/        scen9.do, scen15_mi.do, scen16_mi.do, population_truth_hhsub.do
-  slurm/        scen9.slurm, scen15_mi.slurm, scen16_mi.slurm, submit_coverage.slurm
+  slurm/        population_truth.slurm, scen9.slurm, scen15_mi.slurm, scen16_mi.slurm, submit_coverage.slurm
   evaluation/   coverage_assessment.R
 data/
   population_coefficients/   truth, one CSV per population (tracked)
@@ -62,24 +62,27 @@ data/
 
 ## Running
 
-Run everything from the repo root.
+Submit everything from the repo root. Logs go to `slurm_logs/`.
 
-**1. Population truth**, one per population:
-
-```
-module load stata/19
-srun --mem=4G --time=00:30:00 stata-se -b do scripts/stata/population_truth_hhsub.do dec2024
-```
-
-**2. Time one replicate**, for each new scenario:
+**1. Population truth**, one job per population:
 
 ```
-srun --mem=2G --time=00:30:00 stata-se -b do scripts/stata/scen9.do 1 dec2024
+sbatch scripts/slurm/population_truth.slurm dec2024
+sbatch scripts/slurm/population_truth.slurm oct2026
 ```
 
-**3. Submit.** Set `BLOCK` in the scenario's `.slurm` file so each job takes about
-an hour, then submit with `--array=1-ceil(1000/BLOCK)`. Replicates that already
-have output are skipped.
+**2. Time one replicate.** Submit only the first array task and read the time on
+its first line:
+
+```
+sbatch --array=1 scripts/slurm/scen9.slurm dec2024
+grep "rep 1" slurm_logs/scen9_<jobid>_1.out       # rep 1 done in <N> s
+```
+
+Set `BLOCK` in that `.slurm` file to about `3600 / N`. Task 1 can keep running,
+because the full run skips replicates that already have output.
+
+**3. Full run**, with `--array=1-ceil(1000/BLOCK)`:
 
 | Run | Command |
 |---|---|

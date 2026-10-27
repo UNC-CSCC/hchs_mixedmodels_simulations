@@ -1,6 +1,7 @@
 #!/bin/bash
 #SBATCH -p general
 #SBATCH --account=rc_cai_pi
+#SBATCH --job-name=scen16_mi
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=2G
@@ -25,8 +26,9 @@ mkdir -p "$WORK" "$OUT_DIR"; cd "$WORK"
 for SIM in $(seq "$FIRST" "$LAST"); do
     OUT="${OUT_DIR}/scen16_mi_coef_${SIM}.csv"
     [ -s "$OUT" ] && continue
+    START=$(date +%s)
     timeout 120m stata-se -b do "${SLURM_SUBMIT_DIR}/scripts/stata/scen16_mi.do" "$SIM" "$VARIANT" "$POP"
-    [ -s "$OUT" ] && echo "rep $SIM done" || echo "rep $SIM FAILED" >&2
+    [ -s "$OUT" ] && echo "rep $SIM done in $(( $(date +%s) - START )) s" || echo "rep $SIM FAILED after $(( $(date +%s) - START )) s" >&2
 done
 
 cd "$SLURM_SUBMIT_DIR"; rm -rf "$WORK"
