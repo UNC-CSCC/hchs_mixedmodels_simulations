@@ -1,0 +1,35 @@
+#!/bin/bash
+#SBATCH -p general
+#SBATCH --account=rc_cai_pi
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=1
+#SBATCH --mem=2G
+#SBATCH --time=08:00:00
+#SBATCH --output=/work/users/a/q/aquijano/mixed_sims/hchs_mixedmodels_simulations/slurm_logs/%x_%A_%a.out
+#SBATCH --error=/work/users/a/q/aquijano/mixed_sims/hchs_mixedmodels_simulations/slurm_logs/%x_%A_%a.err
+
+# Measure one replicate with srun, set BLOCK so each job is ~1 hour, then
+# sbatch --array=1-<ceil(N_REPS/BLOCK)> scen15_mi.slurm <variant> <population>   (variant 1-3)
+set -u
+BLOCK=9
+N_REPS=1000
+VARIANT="$1"; POP="$2"
+
+REPO="/work/users/a/q/aquijano/mixed_sims/hchs_mixedmodels_simulations"
+OUT_DIR="${REPO}/data/estimates/${POP}/scen15_mi/v${VARIANT}"
+FIRST=$(( (SLURM_ARRAY_TASK_ID - 1) * BLOCK + 1 ))
+LAST=$(( SLURM_ARRAY_TASK_ID * BLOCK )); [ "$LAST" -gt "$N_REPS" ] && LAST="$N_REPS"
+
+module purge; module add stata/19
+export STATATMP="${REPO}/.statatmp"
+WORK="${STATATMP}/${SLURM_ARRAY_JOB_ID}_${SLURM_ARRAY_TASK_ID}"
+mkdir -p "$WORK" "$OUT_DIR"; cd "$WORK"
+
+for SIM in $(seq "$FIRST" "$LAST"); do
+    OUT="${OUT_DIR}/scen15_mi_coef_${SIM}.csv"
+    [ -s "$OUT" ] && continue
+    timeout 120m stata-se -b do "${REPO}/scripts/stata/scen15_mi.do" "$SIM" "$VARIANT" "$POP"
+    [ -s "$OUT" ] && echo "rep $SIM done" || echo "rep $SIM FAILED" >&2
+done
+
+cd "$REPO"; rm -rf "$WORK"

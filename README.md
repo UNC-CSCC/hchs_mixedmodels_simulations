@@ -27,7 +27,7 @@ block groups for `dec2024` and on households for `oct2026`.
 
 ```
 scripts/stata/        scen9.do, scen15_mi.do, scen16_mi.do, population_truth_hhsub.do
-scripts/slurm/        run_stata_chunked.slurm, submit_coverage.slurm
+scripts/slurm/        scen9.slurm, scen15_mi.slurm, scen16_mi.slurm, submit_coverage.slurm
 scripts/evaluation/   coverage_assessment.R
 data/estimates/       per-replicate coefficient CSVs (gitignored)   data/estimates/<pop>/<scen>/...
 data/summaries/       coverage summaries (gitignored)               data/summaries/<pop>/...
@@ -44,8 +44,8 @@ srun --ntasks=1 --cpus-per-task=1 --mem=2G --time=00:30:00 \
   stata-se -b do scripts/stata/scen9.do 1 dec2024
 ```
 
-Step 2 — set `BLOCK` in `run_stata_chunked.slurm` so `BLOCK x seconds-per-rep` is
-about an hour, then submit with `--array=1-ceil(N_REPS/BLOCK)`. The runner skips
+Step 2 — set `BLOCK` in the scenario's `.slurm` so `BLOCK x seconds-per-rep` is
+about an hour, then submit with `--array=1-ceil(N_REPS/BLOCK)`. Each script skips
 replicates whose output already exists, so reruns are safe.
 
 Population truth (one short job per population):
@@ -58,15 +58,14 @@ srun --ntasks=1 --cpus-per-task=1 --mem=4G --time=00:30:00 \
 scen9, dec2024 (BLOCK 120 -> array 1-9 for 1000 reps):
 
 ```
-sbatch --array=1-9 --job-name=scen9_dec2024 scripts/slurm/run_stata_chunked.slurm \
-  scen9 'data/estimates/dec2024/scen9/scen9_coef_{SIM}.csv' dec2024
+sbatch --array=1-9 --job-name=scen9_dec2024 scripts/slurm/scen9.slurm dec2024
 ```
 
-scen15/scen16 arms on oct2026 — one submit per arm (variant 1-3):
+scen15/scen16 arms on oct2026 — one submit per variant (1-3):
 
 ```
-sbatch --array=1-112 --job-name=scen15_v1_oct2026 scripts/slurm/run_stata_chunked.slurm \
-  scen15_mi 'data/estimates/oct2026/scen15_mi/v1/scen15_mi_coef_{SIM}.csv' 1 oct2026
+sbatch --array=1-112 --job-name=scen15_v1_oct2026 scripts/slurm/scen15_mi.slurm 1 oct2026
+sbatch --array=1-112 --job-name=scen16_v1_oct2026 scripts/slurm/scen16_mi.slurm 1 oct2026
 ```
 
 Coverage summaries (after estimates exist):
