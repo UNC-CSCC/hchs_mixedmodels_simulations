@@ -1,0 +1,10 @@
+# SLURM logs and Stata scratch
+slurm_logs/
+.statatmp/
+*.log
+
+# Simulation outputs (regenerable from the beibo samples)
+data/estimates/
+data/summaries/
+
+# Keep the population-truth CSVs tracked (data/population_coefficients/ is not ignored)
