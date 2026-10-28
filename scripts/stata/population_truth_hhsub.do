@@ -4,7 +4,7 @@ set linesize 255
 
 * Census ("true") parameters: the analysis model fitted, unweighted, to the whole population with
 * household and subject random intercepts. Gives the fixed effects plus var_hhid, var_subid and s2
-* used as the truth for coverage of scen9/scen15/scen16.
+* used as the truth for coverage of all scenarios.
 * Usage: do population_truth_hhsub.do <population> [last_row]
 *   population: dec2024 or oct2026
 *   last_row:   optional; fit only the first <last_row> rows (smoke test). Omit for the full population.

@@ -14,8 +14,8 @@ module load r/4.4.0 2>/dev/null || module load r 2>/dev/null || true
 mkdir -p "${SLURM_SUBMIT_DIR}/data/summaries" "${SLURM_SUBMIT_DIR}/slurm_logs"
 
 # One summary per scenario/population/variant that has estimates on disk.
-for PRESET in 9_dec2024 9_oct2026 \
-              15_v1_oct2026 15_v2_oct2026 15_v3_oct2026 \
-              16_v1_oct2026 16_v2_oct2026 16_v3_oct2026; do
+for PRESET in 1_dec2024 2_dec2024 3_dec2024 3_oct2026 \
+              4_v1_oct2026 4_v2_oct2026 4_v3_oct2026 \
+              5_v1_oct2026 5_v2_oct2026 5_v3_oct2026; do
   Rscript "${SLURM_SUBMIT_DIR}/scripts/evaluation/coverage_assessment.R" "${PRESET}"
 done

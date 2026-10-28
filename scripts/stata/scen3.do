@@ -2,8 +2,8 @@ version 19
 set more off
 set linesize 255
 
-* Scenario 9: two-step pseudo-likelihood for the 3-level model (visits in subjects in households)
-* Usage: do scen9.do <sim_id> <population>
+* Scenario 3: two-step pseudo-likelihood for the 3-level model (visits in subjects in households)
+* Usage: do scen3.do <sim_id> <population>
 *   population: dec2024 (v3data/Dec2024 samples) or oct2026 (v3data/Oct2026 samples)
 * Step 1 (globally scaled weights): fixed effects and residual variance.
 * Step 2 (unscaled household weight w_bghh, effective-size subject weight sub_s1): household and subject
@@ -20,7 +20,7 @@ local data_dir "/work/users/b/e/beibo/v3data/Dec2024/sample_miss00pct"
 if "`population'" == "oct2026" {
     local data_dir "/work/users/b/e/beibo/v3data/Oct2026/sample_miss00pct"
 }
-local out_dir "`repo'/data/estimates/`population'/scen9"
+local out_dir "`repo'/data/estimates/`population'/scen3"
 capture mkdir "`repo'/data/estimates"
 capture mkdir "`repo'/data/estimates/`population'"
 capture mkdir "`out_dir'"
@@ -129,4 +129,4 @@ post `memhold' ("s2")        (`s2_step1') (`se_s2_step1') (`ll_s2_step1') (`ul_s
 postclose `memhold'
 
 use "`results'", clear
-export delimited using "`out_dir'/scen9_coef_`sim_id'.csv", replace
+export delimited using "`out_dir'/scen3_coef_`sim_id'.csv", replace

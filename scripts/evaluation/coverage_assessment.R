@@ -1,13 +1,12 @@
 #!/usr/bin/env Rscript
 # Summarize coefficient bias, standard errors, coverage rates, and rejection probabilities.
-# Presets: scen9 (dec2024, oct2026) and scen15/scen16 MI variants v1-v3 (oct2026).
 # Usage: Rscript coverage_assessment.R <preset>
-#   preset: 9_dec2024 | 9_oct2026 | 15_v{1,2,3}_oct2026 | 16_v{1,2,3}_oct2026
+#   preset: {1,2,3}_{dec2024,oct2026} | {4,5}_v{1,2,3}_oct2026
 
 repo_root <- "/work/users/a/q/aquijano/mixed_sims/hchs_mixedmodels_simulations"
 
 args <- commandArgs(trailingOnly = TRUE)
-scen_num <- if (length(args) > 0) args[[1]] else "9_dec2024"
+scen_num <- if (length(args) > 0) args[[1]] else "1_dec2024"
 
 truth_file <- function(population) {
   file.path(repo_root, "data", "population_coefficients",
@@ -16,21 +15,23 @@ truth_file <- function(population) {
 
 presets <- list()
 
-# Scenario 9: two-step pseudo-likelihood on the complete-case samples of each population.
-for (population in c("dec2024", "oct2026")) {
-  presets[[paste0("9_", population)]] <- list(
-    coef_dir = file.path(repo_root, "data", "estimates", population, "scen9"),
-    file_pattern = "^scen9_coef_[0-9]+\\.csv$",
-    sim_id_pattern = "^scen9_coef_([0-9]+)\\.csv$",
-    out_file = file.path(repo_root, "data", "summaries", population, "coverage_scen9.csv"),
-    true_file = truth_file(population),
-    label = paste0("scen9_", population)
-  )
+# Scenarios 1-3: complete-case samples of each population.
+for (scen_i in c("1", "2", "3")) {
+  for (population in c("dec2024", "oct2026")) {
+    presets[[paste0(scen_i, "_", population)]] <- list(
+      coef_dir = file.path(repo_root, "data", "estimates", population, paste0("scen", scen_i)),
+      file_pattern = paste0("^scen", scen_i, "_coef_[0-9]+\\.csv$"),
+      sim_id_pattern = paste0("^scen", scen_i, "_coef_([0-9]+)\\.csv$"),
+      out_file = file.path(repo_root, "data", "summaries", population, paste0("coverage_scen", scen_i, ".csv")),
+      true_file = truth_file(population),
+      label = paste0("scen", scen_i, "_", population)
+    )
+  }
 }
 
-# Scenarios 15 (s1) and 16 (s2): MI with scaled weights as imputation covariates, variants v1-v3,
-# on the latest (Oct2026) samples.
-for (scen_i in c("15", "16")) {
+# Scenarios 4 (s1) and 5 (s2): MI with scaled weights as imputation covariates, variants v1-v3,
+# on the Oct2026 samples.
+for (scen_i in c("4", "5")) {
   for (var_i in c("v1", "v2", "v3")) {
     presets[[paste0(scen_i, "_", var_i, "_oct2026")]] <- list(
       coef_dir = file.path(repo_root, "data", "estimates", "oct2026", paste0("scen", scen_i, "_mi"), var_i),

@@ -15,18 +15,30 @@ unweighted, to the full population.
 
 ## Methods
 
-**scen9: two-step pseudo-likelihood** (complete data)
+**Weight scaling** (Pfeffermann et al., 1998). For a weight `w_ij` of unit *i*
+in cluster *j* of the level above:
+
+- `s1`, effective sample size: `w_ij × Σw_ij / Σw_ij²`. The scaled weights sum to the effective cluster size.
+- `s2`, cluster sample size: `w_ij × n_j / Σw_ij`. The scaled weights sum to the actual cluster size.
+
+**scen1 / scen2: one-step pseudo-likelihood** (complete data)
+Each level except the upper one is scaled with respect to the level above. The
+household (upper level) keeps its unscaled weight `w_bghh`. The subject weight is
+scaled within household, with `s1` in scen1 and `s2` in scen2. SEs are clustered
+on households.
+
+**scen3: two-step pseudo-likelihood** (complete data)
 1. Fit with globally scaled subject weights to estimate the fixed effects and `s2`.
 2. Hold those fixed and refit with the household weight and the `s1`-scaled subject
    weight to estimate `var_hhid` and `var_subid`.
 
 SEs are clustered on block groups.
 
-**scen15 / scen16: multiple imputation + scen9**
+**scen4 / scen5: multiple imputation + scen3**
 Visit 2–3 outcomes are set missing at random and imputed by chained regression
 (M = 5), with log design weights as imputation covariates. Each completed dataset
-is fitted with scen9, and the results are pooled with Rubin's rules. scen15 uses
-`s1`-scaled weights as covariates and scen16 uses `s2`-scaled weights:
+is fitted with scen3, and the results are pooled with Rubin's rules. scen4 uses
+`s1`-scaled weights as covariates and scen5 uses `s2`-scaled weights:
 
 | Variant | Imputation weight covariates |
 |---|---|
@@ -34,25 +46,20 @@ is fitted with scen9, and the results are pooled with Rubin's rules. scen15 uses
 | v2 | `log(w_bg) + log(hh_s) + log(sub_s)` |
 | v3 | `log(w_bg) + log(hhsub_s)` |
 
-**Weight scaling** (Pfeffermann et al., 1998), within each cluster *j*:
-
-- `s1`, effective sample size: `w_ij × Σw_ij / Σw_ij²`. The scaled weights sum to the effective cluster size.
-- `s2`, cluster sample size: `w_ij × n_j / Σw_ij`. The scaled weights sum to the actual cluster size.
-
 ## Runs
 
 | Scenario | Populations |
 |---|---|
-| scen9 | dec2024, oct2026 |
-| scen15 v1–v3 | oct2026 |
-| scen16 v1–v3 | oct2026 |
+| scen1, scen2 | dec2024 |
+| scen3 | dec2024, oct2026 |
+| scen4 v1–v3, scen5 v1–v3 | oct2026 |
 
 ## Layout
 
 ```
 scripts/
-  stata/        scen9.do, scen15_mi.do, scen16_mi.do, population_truth_hhsub.do
-  slurm/        population_truth.slurm, scen9.slurm, scen15_mi.slurm, scen16_mi.slurm, submit_coverage.slurm
+  stata/        scen1.do, scen2.do, scen3.do, scen4_mi.do, scen5_mi.do, population_truth_hhsub.do
+  slurm/        population_truth.slurm, scen{1,2,3}.slurm, scen{4,5}_mi.slurm, submit_coverage.slurm
   evaluation/   coverage_assessment.R
 data/
   population_coefficients/   truth, one CSV per population (tracked)
@@ -75,8 +82,8 @@ sbatch scripts/slurm/population_truth.slurm oct2026
 its first line:
 
 ```
-sbatch --array=1 scripts/slurm/scen9.slurm dec2024
-grep "rep 1" slurm_logs/scen9_<jobid>_1.out       # rep 1 done in <N> s
+sbatch --array=1 scripts/slurm/scen1.slurm dec2024
+grep "rep 1" slurm_logs/scen1_<jobid>_1.out       # rep 1 done in <N> s
 ```
 
 Set `BLOCK` in that `.slurm` file to about `3600 / N`. Task 1 can keep running,
@@ -86,9 +93,11 @@ because the full run skips replicates that already have output.
 
 | Run | Command |
 |---|---|
-| scen9 | `sbatch --array=1-9 scripts/slurm/scen9.slurm dec2024` |
-| scen15 | `sbatch --array=1-112 scripts/slurm/scen15_mi.slurm 1 oct2026` |
-| scen16 | `sbatch --array=1-112 scripts/slurm/scen16_mi.slurm 1 oct2026` |
+| scen1 | `sbatch --array=1-9 scripts/slurm/scen1.slurm dec2024` |
+| scen2 | `sbatch --array=1-9 scripts/slurm/scen2.slurm dec2024` |
+| scen3 | `sbatch --array=1-9 scripts/slurm/scen3.slurm dec2024` |
+| scen4 | `sbatch --array=1-112 scripts/slurm/scen4_mi.slurm 1 oct2026` |
+| scen5 | `sbatch --array=1-112 scripts/slurm/scen5_mi.slurm 1 oct2026` |
 
 For the MI scenarios, the first argument is the variant (1–3).
 

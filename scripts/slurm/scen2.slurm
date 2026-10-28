@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH -p general
 #SBATCH --account=rc_cai_pi
-#SBATCH --job-name=scen15_mi
+#SBATCH --job-name=scen2
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=2G
@@ -10,11 +10,11 @@
 #SBATCH --error=/work/users/a/q/aquijano/mixed_sims/hchs_mixedmodels_simulations/slurm_logs/%x_%A_%a.err
 
 set -u
-BLOCK=9
+BLOCK=120
 N_REPS=1000
-VARIANT="$1"; POP="$2"
+POP="$1"
 
-OUT_DIR="${SLURM_SUBMIT_DIR}/data/estimates/${POP}/scen15_mi/v${VARIANT}"
+OUT_DIR="${SLURM_SUBMIT_DIR}/data/estimates/${POP}/scen2"
 FIRST=$(( (SLURM_ARRAY_TASK_ID - 1) * BLOCK + 1 ))
 LAST=$(( SLURM_ARRAY_TASK_ID * BLOCK )); [ "$LAST" -gt "$N_REPS" ] && LAST="$N_REPS"
 
@@ -24,10 +24,10 @@ WORK="${STATATMP}/${SLURM_ARRAY_JOB_ID}_${SLURM_ARRAY_TASK_ID}"
 mkdir -p "$WORK" "$OUT_DIR"; cd "$WORK"
 
 for SIM in $(seq "$FIRST" "$LAST"); do
-    OUT="${OUT_DIR}/scen15_mi_coef_${SIM}.csv"
+    OUT="${OUT_DIR}/scen2_coef_${SIM}.csv"
     [ -s "$OUT" ] && continue
     START=$(date +%s)
-    timeout 120m stata-se -b do "${SLURM_SUBMIT_DIR}/scripts/stata/scen15_mi.do" "$SIM" "$VARIANT" "$POP"
+    timeout 120m stata-se -b do "${SLURM_SUBMIT_DIR}/scripts/stata/scen2.do" "$SIM" "$POP"
     [ -s "$OUT" ] && echo "rep $SIM done in $(( $(date +%s) - START )) s" || echo "rep $SIM FAILED after $(( $(date +%s) - START )) s" >&2
 done
 

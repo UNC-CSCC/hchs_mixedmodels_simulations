@@ -2,8 +2,8 @@ version 19
 set more off
 set linesize 255
 
-* Scenario 16: MI with CLUSTER sample size scaled weights (s2) as imputation-model covariates
-* Usage: do scen16_mi.do <sim_id> <variant> <population>
+* Scenario 5: MI with CLUSTER sample size scaled weights (s2) as imputation-model covariates
+* Usage: do scen5_mi.do <sim_id> <variant> <population>
 *   variant 1: log(w_bg) + log(hh_s2)
 *   variant 2: log(w_bg) + log(hh_s2) + log(sub_s2)
 *   variant 3: log(w_bg) + log(hhsub_s2)   (hhsub = scaled HH x subject product weight)
@@ -39,8 +39,8 @@ local s "s2"
 * Ensure output directory exists
 capture mkdir "`repo'/data/estimates"
 capture mkdir "`out_root'"
-capture mkdir "`out_root'/scen16_mi"
-capture mkdir "`out_root'/scen16_mi/v`variant'"
+capture mkdir "`out_root'/scen5_mi"
+capture mkdir "`out_root'/scen5_mi/v`variant'"
 
 import delimited "`data_dir'/samplemiss_`sim_id'.csv", clear varnames(1) bindquote(strict)
 rename *, lower
@@ -73,7 +73,7 @@ gen double log_hhsub = log(hhsub_`s')
 if "`variant'" == "1" local wt_pred "log_w_bg log_hh"
 if "`variant'" == "2" local wt_pred "log_w_bg log_hh log_sub"
 if "`variant'" == "3" local wt_pred "log_w_bg log_hhsub"
-display "Scenario 16 (`s'), variant `variant': imputation weight covariates = `wt_pred'"
+display "Scenario 5 (`s'), variant `variant': imputation weight covariates = `wt_pred'"
 
 * Mark unobserved visits under MAR missingness flag (miss_ind_mar == 1)
 replace y_gfr = . if miss_ind_mar == 1
@@ -109,7 +109,7 @@ matrix b_all = J(`n_terms', `M', 0)
 matrix v_all = J(`n_terms', `M', 0)
 
 * ==============================================================================
-* RUN SCENARIO 9 TWO-STEP ESTIMATION ACROSS THE M IMPUTED DATASETS
+* RUN SCENARIO 3 TWO-STEP ESTIMATION ACROSS THE M IMPUTED DATASETS
 * ==============================================================================
 forvalues m = 1/`M' {
     preserve
@@ -282,7 +282,7 @@ forvalues i = 1/`n_terms' {
     local ci_high = `q_bar' + `z975' * `se_pooled'
 
     * Variance components (terms 8-10): interval pooled on the log scale and back-transformed,
-    * matching how meglm builds variance intervals in the complete-data scen9 (log SE = SE / estimate)
+    * matching how meglm builds variance intervals in the complete-data scen3 (log SE = SE / estimate)
     if `i' >= 8 {
         local ql_sum = 0
         local ul_sum = 0
@@ -307,10 +307,10 @@ forvalues i = 1/`n_terms' {
 postclose `memhold'
 
 use "`results'", clear
-export delimited using "`out_root'/scen16_mi/v`variant'/scen16_mi_coef_`sim_id'.csv", replace
+export delimited using "`out_root'/scen5_mi/v`variant'/scen5_mi_coef_`sim_id'.csv", replace
 
 * Per-imputation estimates and sampling variances, so the pooling can be redone without refitting
-capture mkdir "`out_root'/scen16_mi/v`variant'/per_imputation"
+capture mkdir "`out_root'/scen5_mi/v`variant'/per_imputation"
 tempname implog
 tempfile imp_results
 postfile `implog' str32 term int imputation double estimate double variance using "`imp_results'", replace
@@ -323,4 +323,4 @@ forvalues i = 1/`n_terms' {
 }
 postclose `implog'
 use "`imp_results'", clear
-export delimited using "`out_root'/scen16_mi/v`variant'/per_imputation/scen16_mi_imp_`sim_id'.csv", replace
+export delimited using "`out_root'/scen5_mi/v`variant'/per_imputation/scen5_mi_imp_`sim_id'.csv", replace
