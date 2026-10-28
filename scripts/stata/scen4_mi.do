@@ -7,8 +7,8 @@ set linesize 255
 *   variant 1: log(w_bg) + log(hh_s1)
 *   variant 2: log(w_bg) + log(hh_s1) + log(sub_s1)
 *   variant 3: log(w_bg) + log(hhsub_s1)   (hhsub = scaled HH x subject product weight)
-*   population: dec2024 (v3data/Dec2024 samples; SEs clustered on block groups)
-*               or oct2026 (v3data/Oct2026 samples; SEs clustered on households)
+*   population: dec2024 (v3data/Dec2024 samples) or oct2026 (v3data/Oct2026 samples)
+* SEs clustered on households.
 args sim_id variant population
 
 if "`sim_id'" == "" {
@@ -26,10 +26,8 @@ if !inlist("`population'", "dec2024", "oct2026") {
 }
 local repo "/work/users/a/q/aquijano/mixed_sims/hchs_mixedmodels_simulations"
 local data_dir "/work/users/b/e/beibo/v3data/Dec2024/sample_miss00pct"
-local cluster_var "gl_bgid"
 if "`population'" == "oct2026" {
     local data_dir "/work/users/b/e/beibo/v3data/Oct2026/sample_miss00pct"
-    local cluster_var "gl_hhid"
 }
 local out_root "`repo'/data/estimates/`population'"
 
@@ -131,7 +129,7 @@ forvalues m = 1/`M' {
         capture meglm y_gfr age_strat_new x12 x17 x18 x6 y_bmi [pw=w_visit] || ///
             gl_hhid:  , pweight(w_bghh) || ///
             gl_subid: , pweight(w_sub_glob) ///
-            vce(cluster `cluster_var') iterate(50) difficult
+            vce(cluster gl_hhid) iterate(50) difficult
         * Stop rather than silently reuse estimates left over from a previous fit
         if _rc {
             display as error "Step 1 meglm failed (m = `m', rc = " _rc ")"
@@ -178,7 +176,7 @@ forvalues m = 1/`M' {
         capture meglm y_gfr age_strat_new x12 x17 x18 x6 y_bmi [pw=w_visit] || ///
             gl_hhid:  , pweight(w_bghh) || ///
             gl_subid: , pweight(sub_s1) ///
-            vce(cluster `cluster_var') ///
+            vce(cluster gl_hhid) ///
             constraints(1/`c') iterate(50) difficult
         if _rc {
             display as error "Step 2 meglm failed (m = `m', rc = " _rc ")"

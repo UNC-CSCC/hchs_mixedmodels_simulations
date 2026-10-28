@@ -8,7 +8,7 @@ set linesize 255
 * Step 1 (globally scaled weights): fixed effects and residual variance.
 * Step 2 (unscaled household weight w_bghh, effective-size subject weight sub_s1): household and subject
 * variances, with the fixed effects and residual variance held at their Step 1 values.
-* Both steps cluster SEs on block groups (the design's PSUs).
+* Both steps cluster SEs on households.
 args sim_id population
 
 if !inlist("`population'", "dec2024", "oct2026") {
@@ -30,7 +30,6 @@ rename *, lower
 
 gen int strat_recoded = mod(strat - 1, 4) + 1
 gen byte age_strat_new = (age_base >= 45)
-egen long gl_bgid  = group(bgid)
 egen long gl_hhid  = group(bgid hhid)
 egen long gl_subid = group(bgid hhid subid)
 
@@ -50,7 +49,7 @@ gen  double w_sub_glob       = w_sub * (_N / sum_w_sub_total)
 meglm y_gfr age_strat_new x12 x17 x18 x6 y_bmi [pw=w_visit] || ///
     gl_hhid:  , pweight(w_bghh) || ///
     gl_subid: , pweight(w_sub_glob)  ///
-    vce(cluster gl_bgid)
+    vce(cluster gl_hhid)
 
 * Save Step 1 fixed-effect point estimates, SEs, and residual variance s2
 tempname rt1
@@ -86,7 +85,7 @@ constraint `c' [/]var(e.y_gfr) = `s2_step1'
 meglm y_gfr age_strat_new x12 x17 x18 x6 y_bmi [pw=w_visit] || ///
     gl_hhid:  , pweight(w_bghh) || ///
     gl_subid: , pweight(sub_s1) ///
-    vce(cluster gl_bgid) ///
+    vce(cluster gl_hhid) ///
     constraints(1/`c')
 
 * ==============================================================================

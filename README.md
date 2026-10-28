@@ -15,6 +15,8 @@ unweighted, to the full population.
 
 ## Methods
 
+All scenarios use robust (sandwich) SEs clustered on households.
+
 **Weight scaling** (Pfeffermann et al., 1998). For a weight `w_ij` of unit *i*
 in cluster *j* of the level above:
 
@@ -24,15 +26,12 @@ in cluster *j* of the level above:
 **scen1 / scen2: one-step pseudo-likelihood** (complete data)
 Each level except the upper one is scaled with respect to the level above. The
 household (upper level) keeps its unscaled weight `w_bghh`. The subject weight is
-scaled within household, with `s1` in scen1 and `s2` in scen2. SEs are clustered
-on households.
+scaled within household, with `s1` in scen1 and `s2` in scen2.
 
 **scen3: two-step pseudo-likelihood** (complete data)
 1. Fit with globally scaled subject weights to estimate the fixed effects and `s2`.
 2. Hold those fixed and refit with the household weight and the `s1`-scaled subject
    weight to estimate `var_hhid` and `var_subid`.
-
-SEs are clustered on block groups.
 
 **scen4 / scen5: multiple imputation + scen3**
 Visit 2–3 outcomes are set missing at random and imputed by chained regression
