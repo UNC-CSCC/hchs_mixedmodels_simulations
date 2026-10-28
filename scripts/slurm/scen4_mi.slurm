@@ -10,7 +10,7 @@
 #SBATCH --error=/work/users/a/q/aquijano/mixed_sims/hchs_mixedmodels_simulations/slurm_logs/%x_%A_%a.err
 
 set -u
-BLOCK=9
+BLOCK=13
 N_REPS=1000
 VARIANT="$1"; POP="$2"
 

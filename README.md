@@ -92,11 +92,11 @@ because the full run skips replicates that already have output.
 
 | Run | Command |
 |---|---|
-| scen1 | `sbatch --array=1-9 scripts/slurm/scen1.slurm dec2024` |
-| scen2 | `sbatch --array=1-9 scripts/slurm/scen2.slurm dec2024` |
-| scen3 | `sbatch --array=1-9 scripts/slurm/scen3.slurm dec2024` |
-| scen4 | `sbatch --array=1-112 scripts/slurm/scen4_mi.slurm 1 oct2026` |
-| scen5 | `sbatch --array=1-112 scripts/slurm/scen5_mi.slurm 1 oct2026` |
+| scen1 | `sbatch --array=1-15 scripts/slurm/scen1.slurm dec2024` |
+| scen2 | `sbatch --array=1-13 scripts/slurm/scen2.slurm dec2024` |
+| scen3 | `sbatch --array=1-19 scripts/slurm/scen3.slurm dec2024` |
+| scen4 | `sbatch --array=1-77 scripts/slurm/scen4_mi.slurm 1 oct2026` |
+| scen5 | `sbatch --array=1-77 scripts/slurm/scen5_mi.slurm 1 oct2026` |
 
 For the MI scenarios, the first argument is the variant (1–3).
 
