@@ -1,16 +1,16 @@
 #!/usr/bin/env Rscript
 # Summarize coefficient bias, standard errors, coverage rates, and rejection probabilities.
 # Usage: Rscript coverage_assessment.R <preset>
-#   preset: {0,1,2,3}_{dec2024,oct2026} | {4,5}_v{1,2,3}_oct2026
+#   preset: {0,1,2,3,3strata,3srs,3unw}_{dec2024,oct2026} | {4,5}_v{1,2,3}_oct2026
 
 repo_root <- "/work/users/a/q/aquijano/mixed_sims/hchs_mixedmodels_simulations"
 
 args <- commandArgs(trailingOnly = TRUE)
 scen_num <- if (length(args) > 0) args[[1]] else "1_dec2024"
 
-truth_file <- function(population) {
+truth_file <- function(population, model = "hhsub") {
   file.path(repo_root, "data", "population_coefficients",
-            paste0("population_coef_", population, "_hhsub.csv"))
+            paste0("population_coef_", population, "_", model, ".csv"))
 }
 
 presets <- list()
@@ -27,6 +27,42 @@ for (scen_i in c("0", "1", "2", "3")) {
       label = paste0("scen", scen_i, "_", population)
     )
   }
+}
+
+# Scenario 3 with design-stratum indicators, against the truth fitted with the same indicators.
+for (population in c("dec2024", "oct2026")) {
+  presets[[paste0("3strata_", population)]] <- list(
+    coef_dir = file.path(repo_root, "data", "estimates", population, "scen3_strata"),
+    file_pattern = "^scen3_strata_coef_[0-9]+\\.csv$",
+    sim_id_pattern = "^scen3_strata_coef_([0-9]+)\\.csv$",
+    out_file = file.path(repo_root, "data", "summaries", population, "coverage_scen3_strata.csv"),
+    true_file = truth_file(population, "strata"),
+    label = paste0("scen3_strata_", population)
+  )
+}
+
+# Scenario 3 analysis model on simple random samples of households, fitted unweighted.
+for (population in c("dec2024", "oct2026")) {
+  presets[[paste0("3srs_", population)]] <- list(
+    coef_dir = file.path(repo_root, "data", "estimates", population, "scen3_srs"),
+    file_pattern = "^scen3_srs_coef_[0-9]+\\.csv$",
+    sim_id_pattern = "^scen3_srs_coef_([0-9]+)\\.csv$",
+    out_file = file.path(repo_root, "data", "summaries", population, "coverage_scen3_srs.csv"),
+    true_file = truth_file(population),
+    label = paste0("scen3_srs_", population)
+  )
+}
+
+# Scenario 3 model fitted to the design samples without weights.
+for (population in c("dec2024", "oct2026")) {
+  presets[[paste0("3unw_", population)]] <- list(
+    coef_dir = file.path(repo_root, "data", "estimates", population, "scen3_unw"),
+    file_pattern = "^scen3_unw_coef_[0-9]+\\.csv$",
+    sim_id_pattern = "^scen3_unw_coef_([0-9]+)\\.csv$",
+    out_file = file.path(repo_root, "data", "summaries", population, "coverage_scen3_unw.csv"),
+    true_file = truth_file(population),
+    label = paste0("scen3_unw_", population)
+  )
 }
 
 # Scenarios 4 (s1) and 5 (s2): MI with scaled weights as imputation covariates, variants v1-v3,

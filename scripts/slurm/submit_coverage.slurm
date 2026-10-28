@@ -15,6 +15,7 @@ mkdir -p "${SLURM_SUBMIT_DIR}/data/summaries" "${SLURM_SUBMIT_DIR}/slurm_logs"
 
 # One summary per scenario/population/variant that has estimates on disk.
 for PRESET in 0_dec2024 1_dec2024 2_dec2024 3_dec2024 3_oct2026 \
+              3strata_dec2024 3strata_oct2026 3srs_oct2026 3unw_oct2026 \
               4_v1_oct2026 4_v2_oct2026 4_v3_oct2026 \
               5_v1_oct2026 5_v2_oct2026 5_v3_oct2026; do
   Rscript "${SLURM_SUBMIT_DIR}/scripts/evaluation/coverage_assessment.R" "${PRESET}"

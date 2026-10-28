@@ -54,23 +54,40 @@ is fitted with scen3, and the results are pooled with Rubin's rules. scen4 uses
 | v2 | `log(w_bg) + log(hh_s) + log(sub_s)` |
 | v3 | `log(w_bg) + log(hhsub_s)` |
 
+**Diagnostics for scen3 on oct2026** (complete data)
+On oct2026, scen3 overestimates `var_subid` (+3.4%, coverage 0.83), while on dec2024 it is
+unbiased. Three variants locate the cause:
+
+| Run | Change from scen3 | `var_subid` bias / coverage |
+|---|---|---|
+| scen3_strata | Design-stratum indicators in the model and in the truth | +3.4% / 0.83 |
+| scen3_srs | Simple random sample of households from the population, unweighted | 0.0% / 0.95 |
+| scen3_unw | Same design samples as scen3, unweighted | +0.3% / 0.94 |
+
+The bias comes from the step 2 weights, not from the sample selection or the population.
+The fixed effects still need the weights: unweighted, `age_strat_new` is 17% off (coverage 0.24).
+
 ## Runs
 
 | Scenario | Populations |
 |---|---|
 | scen0, scen1, scen2 | dec2024 |
 | scen3 | dec2024, oct2026 |
+| scen3_strata | dec2024, oct2026 |
+| scen3_srs, scen3_unw | oct2026 |
 | scen4 v1–v3, scen5 v1–v3 | oct2026 |
 
 ## Layout
 
 ```
 scripts/
-  stata/        scen0.do, scen1.do, scen2.do, scen3.do, scen4_mi.do, scen5_mi.do, population_truth_hhsub.do
-  slurm/        population_truth.slurm, scen{0,1,2,3}.slurm, scen{4,5}_mi.slurm, submit_coverage.slurm
+  stata/        scen{0,1,2,3}.do, scen3_{strata,srs,unw}.do, scen{4,5}_mi.do,
+                population_truth_hhsub.do, population_truth_strata.do
+  slurm/        population_truth.slurm, scen{0,1,2,3}.slurm, scen3_{strata,srs,unw}.slurm,
+                scen{4,5}_mi.slurm, submit_coverage.slurm
   evaluation/   coverage_assessment.R
 data/
-  population_coefficients/   truth, one CSV per population (tracked)
+  population_coefficients/   truth per population and model: _hhsub, _strata (tracked)
   estimates/<pop>/<scen>/    one CSV per replicate (not tracked)
   summaries/<pop>/           coverage tables (tracked)
 ```
@@ -84,6 +101,7 @@ Submit everything from the repo root. Logs go to `slurm_logs/`.
 ```
 sbatch scripts/slurm/population_truth.slurm dec2024
 sbatch scripts/slurm/population_truth.slurm oct2026
+sbatch scripts/slurm/population_truth.slurm oct2026 strata    # truth for scen3_strata
 ```
 
 **2. Time one replicate.** Submit only the first array task and read the time on
@@ -105,6 +123,9 @@ because the full run skips replicates that already have output.
 | scen1 | `sbatch --array=1-15 scripts/slurm/scen1.slurm dec2024` |
 | scen2 | `sbatch --array=1-13 scripts/slurm/scen2.slurm dec2024` |
 | scen3 | `sbatch --array=1-19 scripts/slurm/scen3.slurm dec2024` |
+| scen3_strata | `sbatch --array=1-40 scripts/slurm/scen3_strata.slurm oct2026` |
+| scen3_srs | `sbatch --array=1-34 scripts/slurm/scen3_srs.slurm oct2026` |
+| scen3_unw | `sbatch --array=1-17 scripts/slurm/scen3_unw.slurm oct2026` |
 | scen4 | `sbatch --array=1-77 scripts/slurm/scen4_mi.slurm 1 oct2026` |
 | scen5 | `sbatch --array=1-77 scripts/slurm/scen5_mi.slurm 1 oct2026` |
 

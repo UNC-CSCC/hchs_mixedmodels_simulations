@@ -11,13 +11,14 @@
 
 set -u
 POP="$1"
+MODEL="${2:-hhsub}"
 
 module purge; module add stata/19
 export STATATMP="${SLURM_SUBMIT_DIR}/.statatmp"
 WORK="${STATATMP}/${SLURM_JOB_ID}"
 mkdir -p "$WORK"; cd "$WORK"
 
-stata-se -b do "${SLURM_SUBMIT_DIR}/scripts/stata/population_truth_hhsub.do" "$POP"
-cp population_truth_hhsub.log "${SLURM_SUBMIT_DIR}/slurm_logs/population_truth_${POP}_${SLURM_JOB_ID}.log"
+stata-se -b do "${SLURM_SUBMIT_DIR}/scripts/stata/population_truth_${MODEL}.do" "$POP"
+cp "population_truth_${MODEL}.log" "${SLURM_SUBMIT_DIR}/slurm_logs/population_truth_${MODEL}_${POP}_${SLURM_JOB_ID}.log"
 
 cd "$SLURM_SUBMIT_DIR"; rm -rf "$WORK"
