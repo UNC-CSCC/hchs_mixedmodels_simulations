@@ -23,6 +23,10 @@ in cluster *j* of the level above:
 - `s1`, effective sample size: `w_ij × Σw_ij / Σw_ij²`. The scaled weights sum to the effective cluster size.
 - `s2`, cluster sample size: `w_ij × n_j / Σw_ij`. The scaled weights sum to the actual cluster size.
 
+**scen0: one-step pseudo-likelihood, global scaling** (complete data)
+The household keeps its unscaled weight `w_bghh`. The subject weight is scaled
+globally to mean 1 across the sample, with no scaling within household.
+
 **scen1 / scen2: one-step pseudo-likelihood** (complete data)
 Each level except the upper one is scaled with respect to the level above. The
 household (upper level) keeps its unscaled weight `w_bghh`. The subject weight is
@@ -49,7 +53,7 @@ is fitted with scen3, and the results are pooled with Rubin's rules. scen4 uses
 
 | Scenario | Populations |
 |---|---|
-| scen1, scen2 | dec2024 |
+| scen0, scen1, scen2 | dec2024 |
 | scen3 | dec2024, oct2026 |
 | scen4 v1–v3, scen5 v1–v3 | oct2026 |
 
@@ -57,8 +61,8 @@ is fitted with scen3, and the results are pooled with Rubin's rules. scen4 uses
 
 ```
 scripts/
-  stata/        scen1.do, scen2.do, scen3.do, scen4_mi.do, scen5_mi.do, population_truth_hhsub.do
-  slurm/        population_truth.slurm, scen{1,2,3}.slurm, scen{4,5}_mi.slurm, submit_coverage.slurm
+  stata/        scen0.do, scen1.do, scen2.do, scen3.do, scen4_mi.do, scen5_mi.do, population_truth_hhsub.do
+  slurm/        population_truth.slurm, scen{0,1,2,3}.slurm, scen{4,5}_mi.slurm, submit_coverage.slurm
   evaluation/   coverage_assessment.R
 data/
   population_coefficients/   truth, one CSV per population (tracked)
@@ -92,6 +96,7 @@ because the full run skips replicates that already have output.
 
 | Run | Command |
 |---|---|
+| scen0 | `sbatch --array=1-17 scripts/slurm/scen0.slurm dec2024` |
 | scen1 | `sbatch --array=1-15 scripts/slurm/scen1.slurm dec2024` |
 | scen2 | `sbatch --array=1-13 scripts/slurm/scen2.slurm dec2024` |
 | scen3 | `sbatch --array=1-19 scripts/slurm/scen3.slurm dec2024` |

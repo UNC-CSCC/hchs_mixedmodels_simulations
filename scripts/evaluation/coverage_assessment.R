@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 # Summarize coefficient bias, standard errors, coverage rates, and rejection probabilities.
 # Usage: Rscript coverage_assessment.R <preset>
-#   preset: {1,2,3}_{dec2024,oct2026} | {4,5}_v{1,2,3}_oct2026
+#   preset: {0,1,2,3}_{dec2024,oct2026} | {4,5}_v{1,2,3}_oct2026
 
 repo_root <- "/work/users/a/q/aquijano/mixed_sims/hchs_mixedmodels_simulations"
 
@@ -15,8 +15,8 @@ truth_file <- function(population) {
 
 presets <- list()
 
-# Scenarios 1-3: complete-case samples of each population.
-for (scen_i in c("1", "2", "3")) {
+# Scenarios 0-3: complete-case samples of each population.
+for (scen_i in c("0", "1", "2", "3")) {
   for (population in c("dec2024", "oct2026")) {
     presets[[paste0(scen_i, "_", population)]] <- list(
       coef_dir = file.path(repo_root, "data", "estimates", population, paste0("scen", scen_i)),
