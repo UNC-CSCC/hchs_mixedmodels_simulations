@@ -37,6 +37,11 @@ scaled within household, with `s1` in scen1 and `s2` in scen2.
 2. Hold those fixed and refit with the household weight and the `s1`-scaled subject
    weight to estimate `var_hhid` and `var_subid`.
 
+Why two steps: in a single fit, global scaling (scen0) leaves the fixed effects
+unbiased but biases the variance components. Scaling within household (scen1,
+scen2) fixes the variance components but biases the fixed effects. scen3 takes
+each part from the scaling that estimates it well.
+
 **scen4 / scen5: multiple imputation + scen3**
 Visit 2–3 outcomes are set missing at random and imputed by chained regression
 (M = 5), with log design weights as imputation covariates. Each completed dataset
@@ -111,5 +116,5 @@ For the MI scenarios, the first argument is the variant (1–3).
 sbatch scripts/slurm/submit_coverage.slurm
 ```
 
-This reports bias, empirical vs. model SE, model-based coverage, and coverage
-from the empirical SE.
+This writes one table per run to `data/summaries/<pop>/coverage_<scen>.csv`, with
+bias, empirical vs. model SE, model-based coverage, and coverage from the empirical SE.
