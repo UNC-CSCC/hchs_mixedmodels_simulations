@@ -1,0 +1,18 @@
+{
+  "replicates": 1000,
+  "coefficient_rows": 10000,
+  "original_200_unchanged": true,
+  "original_scen3_unchanged": true,
+  "exact_count_records_verified": 1000,
+  "fit_status": {
+    "OK": 1000
+  },
+  "max_kkt_error": 4.06262697169e-07,
+  "max_step1_score_error": 7.55483917964e-06,
+  "max_jacobian_condition": 13892.60025858178,
+  "n_psu": [
+    220
+  ],
+  "min_subjects": 14200,
+  "max_subjects": 16559
+}

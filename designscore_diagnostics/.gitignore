@@ -1,0 +1,8 @@
+# Local diagnostic datasets and run artifacts
+/data/design_frames/
+/data/estimates/
+/data/run_artifacts/
+/logs/
+/.statatmp/
+__pycache__/
+*.pyc

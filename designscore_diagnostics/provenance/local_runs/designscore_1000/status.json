@@ -1,0 +1,122 @@
+{
+  "started_at": "2026-10-29T03:22:16.333085+00:00",
+  "status": "complete",
+  "workers": 8,
+  "expected_replicates": 1000,
+  "jobs": {
+    "201_250": {
+      "stage": "complete",
+      "updated_at": "2026-10-29T04:13:34.300409+00:00",
+      "verified_counts": 50,
+      "attempted": 50,
+      "failed_fits": []
+    },
+    "251_300": {
+      "stage": "complete",
+      "updated_at": "2026-10-29T04:13:48.076118+00:00",
+      "verified_counts": 50,
+      "attempted": 50,
+      "failed_fits": []
+    },
+    "301_350": {
+      "stage": "complete",
+      "updated_at": "2026-10-29T04:12:58.818844+00:00",
+      "verified_counts": 50,
+      "attempted": 50,
+      "failed_fits": []
+    },
+    "351_400": {
+      "stage": "complete",
+      "updated_at": "2026-10-29T04:14:25.771860+00:00",
+      "verified_counts": 50,
+      "attempted": 50,
+      "failed_fits": []
+    },
+    "401_450": {
+      "stage": "complete",
+      "updated_at": "2026-10-29T04:14:06.247081+00:00",
+      "verified_counts": 50,
+      "attempted": 50,
+      "failed_fits": []
+    },
+    "451_500": {
+      "stage": "complete",
+      "updated_at": "2026-10-29T04:13:53.070468+00:00",
+      "verified_counts": 50,
+      "attempted": 50,
+      "failed_fits": []
+    },
+    "501_550": {
+      "stage": "complete",
+      "updated_at": "2026-10-29T04:15:05.041480+00:00",
+      "verified_counts": 50,
+      "attempted": 50,
+      "failed_fits": []
+    },
+    "551_600": {
+      "stage": "complete",
+      "updated_at": "2026-10-29T04:14:53.659268+00:00",
+      "verified_counts": 50,
+      "attempted": 50,
+      "failed_fits": []
+    },
+    "601_650": {
+      "stage": "complete",
+      "updated_at": "2026-10-29T05:00:08.605971+00:00",
+      "verified_counts": 50,
+      "attempted": 50,
+      "failed_fits": []
+    },
+    "651_700": {
+      "stage": "complete",
+      "updated_at": "2026-10-29T05:00:25.444747+00:00",
+      "verified_counts": 50,
+      "attempted": 50,
+      "failed_fits": []
+    },
+    "701_750": {
+      "stage": "complete",
+      "updated_at": "2026-10-29T05:00:40.585153+00:00",
+      "verified_counts": 50,
+      "attempted": 50,
+      "failed_fits": []
+    },
+    "751_800": {
+      "stage": "complete",
+      "updated_at": "2026-10-29T05:01:41.591240+00:00",
+      "verified_counts": 50,
+      "attempted": 50,
+      "failed_fits": []
+    },
+    "801_850": {
+      "stage": "complete",
+      "updated_at": "2026-10-29T05:01:23.894816+00:00",
+      "verified_counts": 50,
+      "attempted": 50,
+      "failed_fits": []
+    },
+    "851_900": {
+      "stage": "complete",
+      "updated_at": "2026-10-29T05:01:55.368602+00:00",
+      "verified_counts": 50,
+      "attempted": 50,
+      "failed_fits": []
+    },
+    "901_950": {
+      "stage": "complete",
+      "updated_at": "2026-10-29T05:01:40.281464+00:00",
+      "verified_counts": 50,
+      "attempted": 50,
+      "failed_fits": []
+    },
+    "951_1000": {
+      "stage": "complete",
+      "updated_at": "2026-10-29T05:02:28.963515+00:00",
+      "verified_counts": 50,
+      "attempted": 50,
+      "failed_fits": []
+    }
+  },
+  "previous_200_samples_verified": true,
+  "completed_at": "2026-10-29T05:02:34.313120+00:00"
+}

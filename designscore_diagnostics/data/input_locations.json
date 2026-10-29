@@ -1,0 +1,14 @@
+{
+  "paths_relative_to": "designscore_diagnostics",
+  "hchs_root": "../..",
+  "population": "../../data/Oct2026/population_3visits_Oct2026.csv",
+  "population_md5": "082095F4B4EEF8079488C2A7999CA186",
+  "sample_directory": "../../data/Oct2026/sample_miss00pct",
+  "sample_pattern": "samplemiss_<id>.csv",
+  "first_replicate": 1,
+  "last_replicate": 1000,
+  "completion_records": "samplemiss_<id>.csv.complete",
+  "production_sampler": "../../code/v3/Oct2026/sample/generate_samples.R",
+  "exact_selection_counts": "data/design_frames/oct2026_subject_counts.csv",
+  "note": "Population and sample files are shared inputs, kept in their original location. Population truth CSVs in this folder are unchanged copies from the parent repository."
+}

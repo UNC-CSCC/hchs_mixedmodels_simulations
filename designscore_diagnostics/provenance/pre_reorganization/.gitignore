@@ -1,0 +1,11 @@
+# SLURM logs and Stata scratch
+slurm_logs/
+.statatmp/
+*.log
+
+# Per-replicate estimates (regenerable)
+data/estimates/
+
+# Derived design-score frame lookups and selection metadata.
+data/design_frames/
+

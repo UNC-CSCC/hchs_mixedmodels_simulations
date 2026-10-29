@@ -1,0 +1,157 @@
+# hchs_mixedmodels_simulations
+
+Simulation study of survey-weighted three-level linear mixed models (visits in
+subjects in households) under the HCHS/SOL sampling design.
+
+## Model
+
+```
+y_gfr ~ age_strat_new + x12 + x17 + x18 + x6 + y_bmi + (1 | household) + (1 | subject)
+```
+
+Targets: the fixed effects, the household and subject variances (`var_hhid`,
+`var_subid`) and the residual variance (`s2`). The truth is the same model fitted,
+unweighted, to the full population.
+
+## Methods
+
+The original scenarios use robust (sandwich) SEs clustered on households.
+The new design-score variant uses a stacked sandwich clustered on block groups
+within design strata, as described in its implementation guide below.
+
+**Weight scaling** (Pfeffermann et al., 1998). For a weight `w_ij` of unit *i*
+in cluster *j* of the level above:
+
+- `s1`, effective sample size: `w_ij × Σw_ij / Σw_ij²`. The scaled weights sum to the effective cluster size.
+- `s2`, cluster sample size: `w_ij × n_j / Σw_ij`. The scaled weights sum to the actual cluster size.
+
+**scen0: one-step pseudo-likelihood, global scaling** (complete data)
+The household keeps its unscaled weight `w_bghh`. The subject weight is scaled
+globally to mean 1 across the sample, with no scaling within household.
+
+**scen1 / scen2: one-step pseudo-likelihood** (complete data)
+Each level except the upper one is scaled with respect to the level above. The
+household (upper level) keeps its unscaled weight `w_bghh`. The subject weight is
+scaled within household, with `s1` in scen1 and `s2` in scen2.
+
+**scen3: two-step pseudo-likelihood** (complete data)
+1. Fit with globally scaled subject weights to estimate the fixed effects and `s2`.
+2. Hold those fixed and refit with the household weight and the `s1`-scaled subject
+   weight to estimate `var_hhid` and `var_subid`.
+
+Why two steps: in a single fit, global scaling (scen0) leaves the fixed effects
+unbiased but biases the variance components. Scaling within household (scen1,
+scen2) fixes the variance components but biases the fixed effects. scen3 takes
+each part from the scaling that estimates it well.
+
+**scen4 / scen5: multiple imputation + scen3**
+Visit 2–3 outcomes are set missing at random and imputed by chained regression
+(M = 5), with log design weights as imputation covariates. Each completed dataset
+is fitted with scen3, and the results are pooled with Rubin's rules. scen4 uses
+`s1`-scaled weights as covariates and scen5 uses `s2`-scaled weights:
+
+| Variant | Imputation weight covariates |
+|---|---|
+| v1 | `log(w_bg) + log(hh_s)` |
+| v2 | `log(w_bg) + log(hh_s) + log(sub_s)` |
+| v3 | `log(w_bg) + log(hhsub_s)` |
+
+**Diagnostics for scen3 on oct2026** (complete data)
+On oct2026, scen3 overestimates `var_subid` (+3.4%, coverage 0.83), while on dec2024 it is
+unbiased. Three variants locate the cause:
+
+| Run | Change from scen3 | `var_subid` bias / coverage |
+|---|---|---|
+| scen3_strata | Design-stratum indicators in the model and in the truth | +3.4% / 0.83 |
+| scen3_srs | Simple random sample of households from the population, unweighted | 0.0% / 0.95 |
+| scen3_unw | Same design samples as scen3, unweighted | +0.3% / 0.94 |
+
+The bias comes from the step 2 weights, not from the sample selection or the population.
+The fixed effects still need the weights: unweighted, `age_strat_new` is 17% off (coverage 0.24).
+
+## Runs
+
+| Scenario | Populations |
+|---|---|
+| scen0, scen1, scen2 | dec2024 |
+| scen3 | dec2024, oct2026 |
+| scen3_strata | dec2024, oct2026 |
+| scen3_srs, scen3_unw | oct2026 |
+| scen4 v1–v3, scen5 v1–v3 | oct2026 |
+
+## Layout
+
+```
+scripts/
+  stata/        scen{0,1,2,3}.do, scen3_{strata,srs,unw}.do, scen{4,5}_mi.do,
+                population_truth_hhsub.do, population_truth_strata.do
+  slurm/        population_truth.slurm, scen{0,1,2,3}.slurm, scen3_{strata,srs,unw}.slurm,
+                scen{4,5}_mi.slurm, submit_coverage.slurm
+  evaluation/   coverage_assessment.R
+data/
+  population_coefficients/   truth per population and model: _hhsub, _strata (tracked)
+  estimates/<pop>/<scen>/    one CSV per replicate (not tracked)
+  summaries/<pop>/           coverage tables (tracked)
+```
+
+## Running
+
+The **scenario 3 design-score variant** has a separate
+[implementation and input guide](scripts/stata/SCEN3_DESIGNSCORE.md). It retains
+the original Step 1 and replaces Step 2 with design-weighted census variance
+scores. It requires a household frame lookup and an explicit `exact` or
+`bernoulli` subject-probability mode. Its outputs and diagnostics are separate
+from the original scenarios; existing coverage submissions do not include it.
+The local Oct2026 run of samples 1–1,000 is complete using verified exact selection
+probabilities: [coverage summary](data/summaries/oct2026/coverage_scen3_designscore_exact.csv)
+and [replicate audit](data/summaries/oct2026/audit_scen3_designscore_exact.csv).
+All 1,000 fits have usable intervals. The `var_subid` empirical bias is −0.0204
+(−0.012%), with 93.8% coverage; its bias Monte Carlo SE is 0.1980.
+The original 200 estimates were retained, and their earlier summary is
+[archived separately](data/summaries/oct2026/archive_200/coverage_scen3_designscore_exact.csv).
+
+Submit everything from the repo root. Logs go to `slurm_logs/`.
+
+**1. Population truth**, one job per population:
+
+```
+sbatch scripts/slurm/population_truth.slurm dec2024
+sbatch scripts/slurm/population_truth.slurm oct2026
+sbatch scripts/slurm/population_truth.slurm oct2026 strata    # truth for scen3_strata
+```
+
+**2. Time one replicate.** Submit only the first array task and read the time on
+its first line:
+
+```
+sbatch --array=1 scripts/slurm/scen1.slurm dec2024
+grep "rep 1" slurm_logs/scen1_<jobid>_1.out       # rep 1 done in <N> s
+```
+
+Set `BLOCK` in that `.slurm` file to about `3600 / N`. Task 1 can keep running,
+because the full run skips replicates that already have output.
+
+**3. Full run**, with `--array=1-ceil(1000/BLOCK)`:
+
+| Run | Command |
+|---|---|
+| scen0 | `sbatch --array=1-17 scripts/slurm/scen0.slurm dec2024` |
+| scen1 | `sbatch --array=1-15 scripts/slurm/scen1.slurm dec2024` |
+| scen2 | `sbatch --array=1-13 scripts/slurm/scen2.slurm dec2024` |
+| scen3 | `sbatch --array=1-19 scripts/slurm/scen3.slurm dec2024` |
+| scen3_strata | `sbatch --array=1-40 scripts/slurm/scen3_strata.slurm oct2026` |
+| scen3_srs | `sbatch --array=1-34 scripts/slurm/scen3_srs.slurm oct2026` |
+| scen3_unw | `sbatch --array=1-17 scripts/slurm/scen3_unw.slurm oct2026` |
+| scen4 | `sbatch --array=1-77 scripts/slurm/scen4_mi.slurm 1 oct2026` |
+| scen5 | `sbatch --array=1-77 scripts/slurm/scen5_mi.slurm 1 oct2026` |
+
+For the MI scenarios, the first argument is the variant (1–3).
+
+**4. Coverage**, once the estimates exist:
+
+```
+sbatch scripts/slurm/submit_coverage.slurm
+```
+
+This writes one table per run to `data/summaries/<pop>/coverage_<scen>.csv`, with
+bias, empirical vs. model SE, model-based coverage, and coverage from the empirical SE.

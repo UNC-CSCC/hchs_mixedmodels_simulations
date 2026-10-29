@@ -1,0 +1,2 @@
+# Preserve exact bytes so recorded SHA-256 fingerprints survive Git checkout.
+* -text whitespace=cr-at-eol,-blank-at-eof

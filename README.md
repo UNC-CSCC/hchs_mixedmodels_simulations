@@ -15,7 +15,9 @@ unweighted, to the full population.
 
 ## Methods
 
-All scenarios use robust (sandwich) SEs clustered on households.
+The original scenarios use robust (sandwich) SEs clustered on households.
+The new design-score variant uses a stacked sandwich clustered on block groups
+within design strata, as described in its implementation guide below.
 
 **Weight scaling** (Pfeffermann et al., 1998). For a weight `w_ij` of unit *i*
 in cluster *j* of the level above:
@@ -93,6 +95,20 @@ data/
 ```
 
 ## Running
+
+The **scenario 3 design-score variant** is organized under
+[`designscore_diagnostics/`](designscore_diagnostics/), with its own code, derived
+data, logs, summaries and provenance. It has a separate
+[implementation and input guide](designscore_diagnostics/README.md). It retains
+the original Step 1 and replaces Step 2 with design-weighted census variance
+scores. It requires a household frame lookup and an explicit `exact` or
+`bernoulli` subject-probability mode. Its outputs and diagnostics are separate
+from the original scenarios; existing coverage submissions do not include it.
+The local Oct2026 run of samples 1–1,000 is complete using verified exact selection
+probabilities: [coverage summary](designscore_diagnostics/summaries/oct2026/coverage_scen3_designscore_exact.csv)
+and [replicate audit](designscore_diagnostics/summaries/oct2026/audit_scen3_designscore_exact.csv).
+All 1,000 fits have usable intervals. The `var_subid` empirical bias is −0.0204
+(−0.012%), with 93.8% coverage; its bias Monte Carlo SE is 0.1980.
 
 Submit everything from the repo root. Logs go to `slurm_logs/`.
 
