@@ -1,0 +1,66 @@
+Age-specific subject random-intercept variance check — 29 October 2026
+
+Each saved complete population contains 1,266,981 subjects and 633,602
+households, with three visits per subject. Younger means baseline age <45;
+older means baseline age >=45. There are 773,457 younger and 493,524 older
+subjects in each population. No visit-missingness mask was applied.
+
+Primary model: unweighted Gaussian maximum likelihood, using the same fixed
+effects as scenario 3 (intercept, age group, x12, x17, x18, x6, y_bmi), one
+shared household random-intercept variance, separate subject random-intercept
+variances by age group, and separate independent visit-residual variances by
+age group. Fixed effects are jointly reestimated, not held at saved values.
+Households containing both age groups retain their shared household effect.
+No block-group random effect is included, matching the scenario 3 working model.
+
+PRIMARY RESULTS (variances, in squared outcome units)
+Population   Subject <45   Subject >=45   Older/younger   Percent difference
+Dec2024      117.424888     117.138481     0.997561       -0.244%
+Oct2026      156.311682     205.266800     1.313189       +31.319%
+
+Population   Household    Visit residual <45   Visit residual >=45
+Dec2024      38.876106     57.324226            56.227610
+Oct2026      22.509029     86.093810           109.191121
+
+SENSITIVITY: separate subject variances with a common visit-residual variance
+Population   Subject <45   Subject >=45   Older/younger
+Dec2024      117.564776     116.913512     0.994460
+Oct2026      153.312801     209.966891     1.369533
+
+INTERPRETATION
+Subject random-intercept variance is essentially equal across age groups in
+Dec2024, while the fitted variance is appreciably greater among older subjects
+in Oct2026. This difference persists after allowing age-specific visit noise.
+It supports the proposed interaction between age-dependent variability,
+unequal age-group sampling, and scenario 3's within-household weight scaling.
+It does not establish what fraction of the original scenario 3 bias is caused
+by this mechanism. These are fitted variance components under an expanded
+scenario 3 working model, rather than identified latent generating variances.
+No superpopulation hypothesis test is reported for these census contrasts.
+
+VERIFICATION AND COMPUTATION
+- Exact Gaussian likelihood, compressed by household age composition using
+  subject means and within-subject contrasts; no approximation to the Gaussian
+  covariance likelihood and no sampled population subset for the final fits.
+- Direct dense covariance calculations independently reproduce the likelihood
+  and profiled coefficients on observed-data subsets of both populations.
+- Analytic derivatives agree with numerical derivatives on those subsets.
+- Independent optimizer starts are polished to zero analytic scores and agree
+  to within the programmed relative tolerance of 1e-6.
+- A common-variance fit reproduces the saved Stata census variances to a maximum
+  relative difference of 0.0025%, and fixed effects within 0.000002.
+- Python and R were limited to one logical CPU at below-normal priority.
+- Existing population files were read only. No Stata process was launched,
+  stopped, suspended, or reconfigured. No MI source or output was edited.
+
+REPRODUCIBILITY (all paths relative to this folder)
+prepare.py: read populations and construct exact sufficient statistics.
+fit.R: fit models, perform numerical checks, and save results.
+input_Dec2024.json / input_Oct2026.json: input paths, file metadata and counts.
+sufficient_Dec2024.R / sufficient_Oct2026.R: sufficient statistics.
+age_variance_results.R / age_variance_results.rds: all estimates and diagnostics.
+fit_stdout.txt: full calculation output.
+
+Reference for the Gaussian mixed-model specification and heteroskedastic
+random effects / residual variances: Stata mixed manual,
+https://www.stata.com/manuals/memixed.pdf

@@ -1,0 +1,23 @@
+{
+  "population": "Oct2026",
+  "subjects": 1266981,
+  "households": 633602,
+  "younger": 773457,
+  "older": 493524,
+  "household_patterns": 46,
+  "source": "C:\\Users\\zhaob\\OneDrive - University of North Carolina at Chapel Hill\\CSCC\\HCHS\\HCHS Simulations\\data\\Oct2026\\population_3visits_Oct2026.csv",
+  "source_bytes": 653017707,
+  "source_mtime_ns": 1791607337989706800,
+  "cpu_affinity": "one logical CPU",
+  "process_priority": "below normal",
+  "fixed_effects": [
+    "(Intercept)",
+    "age_strat_new",
+    "x12",
+    "x17",
+    "x18",
+    "x6",
+    "y_bmi"
+  ],
+  "elapsed_seconds": 11.844000000000051
+}

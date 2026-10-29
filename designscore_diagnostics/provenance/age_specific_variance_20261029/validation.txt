@@ -1,0 +1,58 @@
+
+POPULATION: Dec2024
+PASS: compressed likelihood and profiled fixed effects match direct dense covariance.
+common
+       household  subject_younger    subject_older residual_younger
+     38.87722185     117.31051039     117.31051039      56.89711386
+  residual_older
+     56.89711386
+Subject older/younger ratio: 1
+subject_age
+       household  subject_younger    subject_older residual_younger
+     38.87642204     117.56477640     116.91351189      56.89711306
+  residual_older
+     56.89711306
+Subject older/younger ratio: 0.9944604
+residual_age
+       household  subject_younger    subject_older residual_younger
+     38.87645625     117.31276267     117.31276267      57.32673795
+  residual_older
+     56.22381065
+Subject older/younger ratio: 1
+both_age
+       household  subject_younger    subject_older residual_younger
+     38.87610624     117.42488758     117.13848075      57.32422605
+  residual_older
+     56.22760976
+Subject older/younger ratio: 0.9975609
+PASS: original census fit reproduced; maximum variance relative error = 2.425346e-05 ; maximum fixed-effect absolute error = 1.801747e-06
+
+POPULATION: Oct2026
+PASS: compressed likelihood and profiled fixed effects match direct dense covariance.
+common
+       household  subject_younger    subject_older residual_younger
+     22.73859533     175.17386114     175.17386114      95.08983529
+  residual_older
+     95.08983529
+Subject older/younger ratio: 1
+subject_age
+       household  subject_younger    subject_older residual_younger
+     22.51108039     153.31280109     209.96689050      95.08984311
+  residual_older
+     95.08984311
+Subject older/younger ratio: 1.369533
+residual_age
+       household  subject_younger    subject_older residual_younger
+     22.70178675     174.32032433     174.32032433      85.65084878
+  residual_older
+    110.34305581
+Subject older/younger ratio: 1
+both_age
+       household  subject_younger    subject_older residual_younger
+     22.50902860     156.31168204     205.26680012      86.09381042
+  residual_older
+    109.19112120
+Subject older/younger ratio: 1.313189
+PASS: original census fit reproduced; maximum variance relative error = 2.334968e-05 ; maximum fixed-effect absolute error = 6.801212e-07
+
+All diagnostics completed. No Stata process was launched or modified.

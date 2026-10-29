@@ -14,11 +14,47 @@ The populations differ in ways that can expose this problem. [Dec2024](https://g
 
 The saved checks support the weighting explanation: adding stratum indicators leaves the subject-variance bias near 3.4%, while unweighted fits have much smaller bias. Simply removing weights is not a general solution, however: the unweighted age effect has 17.0% relative bias and only 24.2% coverage. These comparisons implicate the weighting procedure without identifying the exact contribution of each population change. See the [stratum-adjusted](../data/summaries/oct2026/coverage_scen3_strata.csv), [household SRS](../data/summaries/oct2026/coverage_scen3_srs.csv), and [unweighted](../data/summaries/oct2026/coverage_scen3_unw.csv) summaries.
 
+### Age-specific subject variance in the two populations
+
+A separate census diagnostic fitted both complete populations, each containing **1,266,981 subjects in 633,602 households**, with three visits per subject. Younger means baseline age below 45; older means age 45 or above. The unweighted Gaussian maximum-likelihood model retained scenario 3's fixed-effect specification and a shared household random intercept, while allowing **both subject random-intercept variance and visit-level residual variance to differ by age group**. Fixed effects were jointly reestimated. Mixed-age households retained their shared household effect; no block-group random effect was added. This is a diagnostic extension of the outcome model, not a change to the design-score estimator.
+
+| Population | Subject variance, age <45 | Subject variance, age ≥45 | Older / younger | Relative difference |
+|---|---:|---:|---:|---:|
+| Dec2024 | 117.425 | 117.138 | 0.998 | −0.24% |
+| Oct2026 | 156.312 | 205.267 | 1.313 | +31.32% |
+
+All entries are **variances**, not standard deviations. The corresponding nuisance variance estimates were:
+
+| Population | Shared household variance | Visit residual variance, age <45 | Visit residual variance, age ≥45 |
+|---|---:|---:|---:|
+| Dec2024 | 38.876 | 57.324 | 56.228 |
+| Oct2026 | 22.509 | 86.094 | 109.191 |
+
+The fitted subject variance is essentially equal by age in Dec2024, but about **31% greater among older subjects in Oct2026**, even after allowing older subjects to have greater visit-level noise. A sensitivity fit with a common visit-residual variance gives subject variances of 117.565 versus 116.914 in Dec2024 and 153.313 versus 209.967 in Oct2026; the conclusion is unchanged.
+
+This finding supports an interaction between age-dependent variability, unequal age-group selection probabilities (nominally 0.3575 for younger and 0.55 for older subjects), and scenario 3's within-household weight scaling. The group with higher October variability is sampled more often, and effective-size scaling does not generally restore the population variance equations. These checks do **not** isolate what fraction of the original six-unit subject-variance bias comes from this mechanism. The reported components are fitted parameters under the expanded working model, not identified latent generating variances; these are descriptive census contrasts, with no superpopulation hypothesis test.
+
+The calculation used an exact Gaussian likelihood compressed by household age composition. Direct dense-covariance checks reproduced the likelihood and profiled fixed effects on small observed-data subsets; independent optimization starts agreed after analytic-score refinement. A common-variance fit reproduced the saved Stata census variances within **0.0025%** and fixed effects within **0.000002**. See the [full age-specific estimates and validation records](provenance/age_specific_variance_20261029/age_variance_results.R), [calculation log](provenance/age_specific_variance_20261029/validation.txt), and [reproduction instructions](provenance/age_specific_variance_20261029/README.txt). The diagnostic was run separately on one logical CPU at below-normal priority, without launching or modifying any Stata MI process.
+
+### Why design-score is a more general correction
+
+**For the sampling-and-weighting bias at issue here, design-score is a broader correction than adding age-specific subject variances.** The current estimator still targets one common household variance and one common subject variance in the original census working model. Age-specific variances describe one particular source of outcome heterogeneity and change the model's parameters of interest. They do not, by themselves, ensure that the scaled sample likelihood recovers the corresponding census equations.
+
+Design-score instead corrects the equations directly: residual squares and subject counts receive inverse individual inclusion weights, within-household cross-products receive inverse pair inclusion weights, household contributions receive inverse household inclusion weights, and covariance denominators use full eligible household sizes. At fixed parameter values, their sampling expectation equals the complete-population variance score. This identity can hold even when residual variability is associated with age or other selection-related characteristics; identifying age as the source of heterogeneity is not required. It targets the common-variance census fit even when the working model does not exactly describe the outcome distribution.
+
+The two approaches are complementary. If age-specific variance components became the scientific targets, the design-score equations would need to be extended for that outcome model. The present correction requires valid selection probabilities and household sizes, and its implementation assumes the specified Gaussian model and three complete visits. Design-unbiased scores do not guarantee unbiased finite-sample roots, remove error from the retained first stage, validate an imputation model, or guarantee nominal interval coverage.
+
 ## Model and estimation target
 
 ### Overview
 
 The method uses a sample to reconstruct the household and subject variance equations for the complete population. It first retains scenario 3's estimates of the fixed effects and visit-level residual variance. It then averages each person's three residuals and weights their squares and cross-products using individual and pair selection probabilities. The Mata solver uses those totals to estimate household and subject variances jointly, and a stacked sandwich calculation carries uncertainty from both stages into the confidence intervals.
+
+The information flow is **subject-average residuals → household estimating equations → block-group score totals → standard errors**. The first two steps produce point estimates; the last two combine information from both estimation stages to quantify uncertainty.
+
+![Subject-average residuals become weighted individual totals and within-household pair products, which enter the explicit household and subject variance equations. Both estimation stages are stacked by household, summed within block groups, and converted to standard errors using a stratified sandwich.](figures/two_stage_designscore.png)
+
+**Figure 1. From subject-average residuals to standard errors.** The upper panels show point estimation: stage 1 supplies fixed effects and visit-residual variance; stage 2 uses weighted counts, residual squares, and products between different subjects in the same household to solve the displayed household-variance and subject-variance equations. The lower panels show uncertainty: weighted household contributions from both stages form a 13-element stack, household stacks are summed within block groups, and their within-stratum variation enters the sandwich. Full eligible household size remains in the covariance denominator. Design strata are the sampling strata, not the younger/older groups. The fixed-parameter expectation identity does not automatically apply at fitted values. [Scalable SVG](figures/two_stage_designscore.svg) · [Figure source](code/evaluation/draw_two_stage_designscore.R).
 
 The sections below explain the population target, required sampling information, score derivation, numerical solution, and uncertainty calculation.
 
@@ -118,13 +154,24 @@ All reported results use the explicit `exact` mode. The optional `bernoulli` mod
 
 ### Reduce the balanced visit records to subject means
 
-For fixed `β`, define the average residual of subject `i`:
+For fixed `β`, define one residual at each of subject `i`'s three visits, then average them:
 
 ```math
-r_{hi}=\frac{1}{3}\sum_{t=1}^{3}(Y_{hit}-x_{hit}^{T}\beta).
+R_{hit}=Y_{hit}-x_{hit}^{T}\beta,\qquad t=1,2,3,
+\qquad
+r_{hi}=\frac{R_{hi1}+R_{hi2}+R_{hi3}}{3}.
 ```
 
-These residuals subtract the fixed-effect prediction only. They do not subtract predicted household or subject random effects.
+In the fitted estimator, substitute the stage-1 estimate `β̂`. These residuals subtract the fixed-effect prediction only; the household and subject random effects remain in them. In an MI analysis, the calculation uses the current imputation's completed data. The three residuals are three visit-level discrepancies, not three types of random effect.
+
+Under the working model with its mean parameter `β`, the subject average has the decomposition `r_hi = u_h + v_hi + ε̄_hi`. Consequently,
+
+```math
+E(r_{hi}^2)=a+b+e/3,\qquad
+E(r_{hi}r_{hj})=a\quad(i\ne j\text{ in the same household}).
+```
+
+Individual squares contain household variance, subject variance, and averaged visit noise. Cross-products between different subjects contain their shared household component. These model identities explain how the terms distinguish variance components; the finite-population design-expectation result below is a separate statement about the sampling weights.
 
 Define
 
@@ -180,38 +227,50 @@ For any fixed candidate parameter values, these scores are linear in the househo
 
 ## Constructing the design weighted scores
 
-For the sampled subjects `s_h` in household `h`, construct
+### Individual totals and within-household pairs
+
+**Individual totals** add one contribution per sampled subject within household `h`. For sampled subjects `s_h`, construct
 
 ```math
 \hat{N}_h=\sum_{i\in s_h}\frac{1}{p_{hi}},\qquad
 \hat{B}_h=\sum_{i\in s_h}\frac{r_{hi}^2}{p_{hi}}.
 ```
 
-and
+Here `p_hi` is the probability that subject `i` is selected, conditional on the selected stage-2 household set. `N̂_h` estimates the eligible subject count; `B̂_h` estimates the total of squared subject-average residuals in the full household. They are household totals formed from individual contributions, not a separate fitted parameter for each person.
+
+**Within-household pairs** are two different sampled subjects `i` and `j` from the same household. They are not two visits from one subject. Their products enter
 
 ```math
-\hat{Q}_h=\hat{B}_h+2\sum_{i<j}\frac{r_{hi}r_{hj}}{p_{hij}}.
+\hat{Q}_h=\hat{B}_h+2\sum_{\substack{i<j\\i,j\in s_h}}\frac{r_{hi}r_{hj}}{p_{hij}}.
 ```
 
-The pair sum includes distinct sampled subjects `i` and `j` within household `h`. The individual squared terms require first-order inclusion probabilities; the distinct-person cross-products require joint inclusion probabilities. This follows the general design-weighted estimating-equation principle discussed by [Rao, Verret, and Hidiroglou, section 3](https://www150.statcan.gc.ca/n1/pub/12-001-x/2013002/article/11887/section3-eng.htm). The particular equations here are derived from the full Gaussian census likelihood above; they are not a direct implementation of that paper's composite likelihood.
+The joint probability `p_hij` is the probability that **both subjects** are selected, conditional on the same stage-2 household set. `Q̂_h` estimates the full household's squared residual sum, `Q_h = (Σ_i r_hi)^2`, including both the individual squares and distinct-person products. With one sampled person, the pair sum is empty and `Q̂_h = B̂_h`; households with multiple sampled subjects supply the cross-person information.
+
+The individual squared terms require first-order inclusion probabilities; the distinct-person cross-products require joint inclusion probabilities. This follows the general design-weighted estimating-equation principle discussed by [Rao, Verret, and Hidiroglou, section 3](https://www150.statcan.gc.ca/n1/pub/12-001-x/2013002/article/11887/section3-eng.htm). The particular equations here are derived from the full Gaussian census likelihood above; they are not a direct implementation of that paper's composite likelihood.
 
 The pair-weighted quantity `Q̂_h` is not the square of an estimated total. For example, under an illustrative independent subject draw with probability one-half, a residual square receives weight two, while a distinct-person product receives weight four. Squaring an inverse-probability estimate of the residual total would incorrectly give the squared terms weight four as well. In a particular sample, `Q̂_h` can also be negative even though its census target `Q_h` is nonnegative.
 
-The estimating equations used by the solver are
+### What solving the two variance equations means
+
+The two unknowns are **`a`, the common household variance, and `b`, the common subject variance**. For stage-2 point fitting, hold `β̂` and `ê` fixed, calculate the residual totals above, and use `d = b + ê/3`, `D_h = d + a M_h`, and `W_h = 1/π_h`, where `π_h` is the household selection probability. For a positive interior solution, the solver finds `a` and `b` satisfying both equations:
 
 ```math
-\hat{U}_a=\frac{1}{2}\sum_{h\in s_{12}}W_h
+\hat{U}_a(a,b)=\frac{1}{2}\sum_{h\in s_{12}}W_h
 \left[\frac{\hat{Q}_h}{D_h^2}-\frac{\hat{N}_h}{D_h}\right]=0.
 ```
 
 and
 
 ```math
-\hat{U}_b=\frac{1}{2}\sum_{h\in s_{12}}W_h
+\hat{U}_b(a,b)=\frac{1}{2}\sum_{h\in s_{12}}W_h
 \left[\frac{\hat{B}_h}{d^2}-\frac{a(2d+aM_h)\hat{Q}_h}{d^2D_h^2}-\frac{\hat{N}_h}{d}+\frac{a\hat{N}_h}{dD_h}\right]=0.
 ```
 
-Here `s₁₂` denotes the households selected at the first two sampling stages. Households with no selected person have `N̂_h = B̂_h = Q̂_h = 0`, so they need not appear as rows in the model-fitting dataset.
+`Û_a` is the sampling-corrected household-variance score; `Û_b` is the sampling-corrected subject-variance score. They are derivatives of the weighted objective shown below with respect to `a` and `b`. Each compares weighted residual information with what the candidate variances predict. A positive score locally favors increasing its variance while holding the other fixed. Solving both equations balances those discrepancies **across households**; it does not require each household's contribution to equal zero.
+
+Write `Û_{a,h}` and `Û_{b,h}` for the two weighted household summands, including their `W_h/2` factors. Thus `Û_a = Σ_h Û_{a,h}` and `Û_b = Σ_h Û_{b,h}`. These same household contributions become the last two entries of the stacked estimating vector used for standard errors. At a zero-variance boundary, the solver uses the one-sided score conditions described under numerical solution rather than requiring both scores to be zero.
+
+Here `s₁₂` denotes the households selected at the first two sampling stages. Households with no selected person have `N̂_h = B̂_h = Q̂_h = 0`, so they need not appear as rows in the model-fitting dataset. In fixed-parameter derivations, `e` denotes the fixed candidate residual variance; in the actual stage-2 fit it is set to `ê`.
 
 **Full household size remains in the covariance denominators.** The solver uses `D_h = d + aM_h` from the frame, not `d + aN̂_h`, the observed sample size, or an effective sample size. Replacing the denominator by an estimated count would introduce a nonlinear ratio and break the expectation identity below.
 
@@ -278,7 +337,7 @@ The multiple starts and boundary checks improve numerical robustness, but do not
 
 ### Propagating uncertainty from both stages
 
-Holding `β̂` and `ê` fixed during point estimation does not make them known without error. The standard-error calculation therefore stacks the first- and second-stage estimating equations.
+Holding `β̂` and `ê` fixed during point estimation does not make them known without error. The standard-error calculation therefore follows the path **subject-average residuals → household estimating equations → block-group score totals → standard errors**, while retaining the full first-stage information.
 
 The parameter vector has 13 entries:
 
@@ -294,28 +353,53 @@ g_{c,h}=n_h-c\sum_{i\in s_h}w_{hi}.
 
 and the two design scores. Here `n_h` is the number of sampled subjects in the household. The normalizer equation is not multiplied by the household weight, matching the global normalization used in the Stata fit.
 
+More explicitly, let `S_h^(1)` contain the ten weighted first-stage equations (seven fixed effects and three variances). Then each household contributes
+
+```math
+\psi_h(\theta)=
+\begin{pmatrix}
+S_h^{(1)}\quad\text{(10 entries)}\\
+g_{c,h}\quad\text{(1 entry)}\\
+\hat U_{a,h}\quad\text{(1 entry)}\\
+\hat U_{b,h}\quad\text{(1 entry)}
+\end{pmatrix}.
+```
+
+The last two entries use the subject-average residual squares and within-household pair products defined above. The first-stage equations additionally retain within-subject visit deviations and covariate information; averaging residuals does not discard those quantities from the full stack. The household variance, subject variance, and residual variance in the first-stage equations are its own nuisance parameters `a₁`, `b₁`, and `e`, while the last two equations target `a₂` and `b₂`.
+
 Let `ψ_h(θ)` be this stacked household estimating vector. The Jacobian is
 
 ```math
 A(\theta)=-\frac{\partial}{\partial\theta^{T}}\sum_h\psi_h(\theta).
 ```
 
-The Jacobian is evaluated at the estimated parameter vector `θ̂`. The implementation obtains it by central differences of the analytic household scores. Equation rescaling is used for numerical stability.
+The Jacobian is evaluated at the estimated parameter vector `θ̂`. The implementation obtains it by central differences of the analytic household scores. In this calculation, perturbing `β` recomputes the residual totals, and perturbing `e` changes the stage-2 denominators. These cross-stage derivatives propagate first-stage estimation error into the final variance-component uncertainty. Equation rescaling is used for numerical stability.
 
 ### Block groups and design strata
 
-Block groups are treated as primary sampling units for the sandwich calculation. Within design stratum `g`, let `m_g` be the number of observed block groups and `Ψ_gk` the sum of household score vectors in block group `k`. The meat of the sandwich is
+Block groups are treated as primary sampling units for the sandwich calculation. Within design stratum `g`, let `m_g` be the number of observed block groups. First **sum**, rather than average, the already weighted household vectors within each block group `k`, then center the resulting block-group totals within their design stratum:
 
 ```math
-B=\sum_g\frac{m_g}{m_g-1}\sum_{k=1}^{m_g}
-(\Psi_{gk}-\bar{\Psi}_g)(\Psi_{gk}-\bar{\Psi}_g)^{T}.
+\Psi_{gk}=\sum_{h\in(g,k)}\psi_h,\qquad
+\bar\Psi_g=\frac{1}{m_g}\sum_{k=1}^{m_g}\Psi_{gk},\qquad
+\Delta_{gk}=\Psi_{gk}-\bar\Psi_g.
 ```
 
-The estimated covariance matrix of `θ̂` is
+The strata here are **sampling-design strata**, not the younger/older groups. All thirteen entries move together as one block-group vector, allowing dependence among subjects and households in that block group and covariance between the two estimation stages. The meat of the sandwich measures the within-stratum variability of these totals:
 
 ```math
-C=A^{-1}B(A^{-1})^{T}.
+\mathcal M=\sum_g\frac{m_g}{m_g-1}\sum_{k=1}^{m_g}
+\Delta_{gk}\Delta_{gk}^{T}.
 ```
+
+`𝓜` is a 13-by-13 score covariance estimate, distinct from the scalar residual total `B̂_h` and the full household size `M_h`. The bread `A⁻¹` converts score fluctuations into parameter fluctuations. The estimated covariance matrix of `θ̂` is
+
+```math
+\widehat V_\theta=A^{-1}\mathcal M(A^{-1})^{T},\qquad
+\operatorname{SE}(\hat\theta_j)=\sqrt{(\widehat V_\theta)_{jj}}.
+```
+
+For logged variance parameters, these are log-scale standard errors; the delta method and log-scale intervals below give the reported variance-scale results. The stacked covariance includes cross-stage dependence, so the second-stage standard errors do not treat the first-stage point estimates as known constants.
 
 This is a stratified, with-replacement, ultimate-cluster approximation. It propagates first-stage parameter uncertainty and covariance with the second-stage scores. It does not include exact multistage finite-population corrections or fully represent the cross-block-group dependence induced by fixed-size subject selection.
 
@@ -421,6 +505,6 @@ Subject-variance bias is small relative to its Monte Carlo standard error of 0.1
 
 ## Scope and implementation
 
-The current implementation uses exactly three complete visits per person and deliberately ignores the MAR visit flag. Applying that flag requires extending the residual moments, first-stage estimation, and uncertainty calculation to account for visit nonresponse. Baseline-covariate missingness and other covariance models also require further work.
+The complete-data wrapper uses exactly three complete visits per person and deliberately ignores the MAR visit flag. The separate paired-MI extension applies the same two-stage estimator to each completed imputation and pools estimates and uncertainty using Rubin's rules; its validity additionally depends on the imputation model. The complete-data results and age-specific census diagnostic in this report are not MI results. Baseline-covariate missingness and other covariance models require further work.
 
 The implementation is in [scen3_designscore.do](code/stata/scen3_designscore.do) and [variance_designscore.mata](code/stata/variance_designscore.mata). The folder [README](README.md) contains execution instructions and file locations; the [audit](summaries/oct2026/audit_scen3_designscore_exact.csv) contains detailed numerical checks. The original scenario 3 code remains unchanged.
