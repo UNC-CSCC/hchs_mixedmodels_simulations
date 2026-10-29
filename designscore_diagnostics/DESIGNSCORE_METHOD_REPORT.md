@@ -39,6 +39,53 @@ The weights sum to an effective sample size, rather than an estimate of the numb
 
 This normalization changes how residual squares, cross-products, and cluster size enter the weighted likelihood. There is no general identity making the resulting variance scores unbiased estimates of the census scores. The design-score construction supplies that identity directly. The singleton example explains a limitation of the original weighting mechanism; it does not establish that singletons alone caused the entire Oct2026 bias.
 
+## Why the original scenario 3 is biased for Oct2026
+
+The central issue is that the original second-stage weighted likelihood does not generally preserve the finite-population variance-score target. The saved diagnostics implicate that weighting step as the main source of the Oct2026 subject-variance bias. The population changes explain why success in Dec2024 does not guarantee success in Oct2026, but the available comparisons do not establish a complete causal decomposition of the six-unit bias.
+
+### What changed in population generation
+
+The [Dec2024 generator](https://github.com/UNC-CSCC/HCHS-Simulations/blob/e9e8128/code/v3/Dec2024/population/generate_population.R) builds continuous eGFR as an additive linear predictor, covariate-by-time terms, and independent Gaussian block-group, household, subject, and observation effects. Scenario 3 is still a simplified working model for this population: it omits the block-group random effect and several generating mean terms, including interactions. Its good Dec2024 performance is therefore empirical evidence for that setting, not proof that its weighting scheme is generally unbiased.
+
+The [Oct2026 generator](https://github.com/UNC-CSCC/HCHS-Simulations/blob/e9e8128/code/v3/Oct2026/population/generate_population.R) instead starts with calibrated three-visit eGFR trajectories and reassigns whole trajectories to people. Trajectories are ordered by a calibrated projection of their three outcomes; participants are ordered by a score combining baseline renal risk with Gaussian block-group, household, and person assignment scores. The allocation weights and trajectory projection are tuned against variance targets on the final eGFR scale. Moving complete trajectories preserves their empirical joint outcome distribution, while changing their associations with covariates and clusters.
+
+The [October calibration specification](https://github.com/UNC-CSCC/HCHS-Simulations/blob/e9e8128/code/v3/Oct2026/population/README.md#how-renal-calibration-and-clustering-are-preserved-together) uses visit effects, standardized baseline renal risk, nested block-group/household/subject intercepts, and visit-specific residual variances. Scenario 3 uses a different fixed-effect specification, omits the block-group intercept, and assumes one common residual variance. Thus the calibration targets and assignment-score variances are **not** the scenario 3 truth. The relevant Oct2026 subject target is **175.174303**, obtained by fitting the scenario 3 working model to the complete population.
+
+The important change is in the conditional mean and covariance structure relative to that working model. Nonnormality alone is not a sufficient explanation: at fixed parameters, Gaussian variance scores depend on residual first and second moments. The code comparison identifies reasons those moments can differ between the populations; it does not by itself show which change produces each unit of bias.
+
+### Why the scaled second-stage likelihood can miss that target
+
+Both versions retain the same nominal age-specific subject-sampling fractions: 0.3575 for younger people and 0.55 for older people, as recorded in the parent repository's [Dec2024](https://github.com/UNC-CSCC/HCHS-Simulations/blob/e9e8128/code/v3/Dec2024/sample/sample_parameters.R) and [Oct2026](https://github.com/UNC-CSCC/HCHS-Simulations/blob/e9e8128/code/v3/Oct2026/sample/sample_parameters.R) sampling parameters. Unequal inclusion probabilities therefore remain relevant to outcome moments associated with age and renal risk.
+
+In [the original second stage](../scripts/stata/scen3.do), `sub_s1` rescales inverse-probability weights to the sampled household's effective size. As shown above, singleton weights become one and a common household weight factor cancels. This can help control the behavior of a model-based weighted likelihood, but it is not a reconstruction of the census household score.
+
+Variance estimation needs both individual residual squares and cross-products between different subjects. The design-unbiased estimators of these totals use the inverse individual inclusion probability and the inverse **joint** inclusion probability, respectively. Normalized subject weights do not in general supply those two corrections. In particular, multiplying two subject weights does not generally give an inverse pair probability under fixed-size sampling. The household likelihood also depends nonlinearly on cluster size; replacing the census size by a sample-dependent effective size changes its covariance denominators. Correcting only the household's outer weight cannot in general undo those within-household changes.
+
+These differences allow the weighted sample score to have a different root from the census score. Their effect depends on the population's residual moments, household structure, and sampling probabilities, which is why the small Dec2024 bias does not transfer automatically to Oct2026. This is a structural explanation for a potential shift; it is not an analytical derivation of the observed bias's exact sign or magnitude.
+
+### What the saved diagnostic runs show
+
+The archived Oct2026 checks provide stronger empirical evidence about the source of the problem. Each row below summarizes 1,000 replicates; no models were rerun to prepare this section.
+
+| Archived analysis | Subject variance target | Mean estimate | Empirical bias | Relative bias | Coverage |
+|---|---:|---:|---:|---:|---:|
+| Original scenario 3 | 175.174303 | 181.174332 | +6.000029 | +3.425% | 83.0% |
+| Scenario 3 with design-stratum indicators | 175.136605 | 181.164476 | +6.027871 | +3.442% | 82.5% |
+| SRS of households, all members retained, unweighted | 175.174303 | 175.154475 | −0.019828 | −0.011% | 95.4% |
+| Original design samples, unweighted fit | 175.174303 | 175.677305 | +0.503002 | +0.287% | 94.0% |
+
+Sources: [original](../data/summaries/oct2026/coverage_scen3.csv), [stratum-adjusted](../data/summaries/oct2026/coverage_scen3_strata.csv), [household SRS](../data/summaries/oct2026/coverage_scen3_srs.csv), and [unweighted design-sample](../data/summaries/oct2026/coverage_scen3_unw.csv) summaries. The stratum-adjusted analysis has its own census target because its mean model changes. The [SRS code](../scripts/stata/scen3_srs.do) samples 11,500 households and keeps every member; it changes both the sampling design and the fitting procedure. The [unweighted code](../scripts/stata/scen3_unw.do) uses the design-sample inputs and replaces the two stages with one unweighted fit. These are diagnostic comparisons, not a controlled one-factor decomposition with independently verified paired input provenance.
+
+Adding stratum indicators barely changes the bias, so omitted stratum main effects are not an adequate explanation. The SRS result shows that the Oct2026 population and working model can yield estimates close to the census target under a different sampling/fitting scheme. The much smaller bias in the unweighted design-sample fit further implicates the weighting procedure, although that comparison changes both original stages.
+
+Removing weights is not a satisfactory overall fix: in the unweighted design-sample summary, the `age_strat_new` coefficient averages **−7.327474** against a census target of **−6.261696**, with **17.0% relative bias** and only **24.2% coverage**. For the original weighted subject variance, the six-unit bias is almost one empirical standard error (6.283556), which helps explain why coverage falls to 83.0%; changing standard errors alone would not remove the point-estimation bias.
+
+### How the design-score replacement addresses the issue
+
+The replacement retains the original first-stage estimates, then weights residual squares and cross-products with their respective individual and joint inclusion probabilities, uses full eligible household sizes in the covariance denominators, and applies household inclusion weights. At fixed model parameters, the resulting score has the census score as its design expectation. This directly addresses the missing identity in the original second stage.
+
+The reduction of subject-variance bias from **+6.000029** to **−0.020366** in the saved summaries supports this correction for Oct2026. It does not prove that every population-calibration feature caused the original bias, nor does score unbiasedness guarantee exactly unbiased estimated roots after plugging in the first-stage estimates. Coverage of **93.8%** also leaves interval calibration as a separate question, discussed below.
+
 ## Model and estimation target
 
 Let household `h` contain `M_h` eligible subjects, indexed by `i`. Each subject has exactly three complete visits, indexed by `t`. The working model is
