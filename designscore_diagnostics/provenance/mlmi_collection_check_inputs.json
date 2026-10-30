@@ -1,0 +1,79 @@
+{
+  "model": "joint6_psu_household_v1",
+  "sampler": "gibbs_interweaving_collapsed_hr_v3",
+  "configuration": {
+    "imputations": 20,
+    "chains": 4,
+    "ridge": 0.0001,
+    "hh_prior": 0.05,
+    "psu_prior": 0.01,
+    "person_prior": 0.5,
+    "max_rhat": 1.01,
+    "min_ess": 400
+  },
+  "replicate_sources": {
+    "1": {
+      "run_label": "mlmi_joint6_m20_run3",
+      "configuration": {
+        "imputations": 20,
+        "chains": 4,
+        "burn": 2000,
+        "between": 1000,
+        "every": 5,
+        "ridge": 0.0001,
+        "hh_prior": 0.05,
+        "psu_prior": 0.01,
+        "person_prior": 0.5,
+        "max_rhat": 1.01,
+        "min_ess": 400
+      }
+    },
+    "2": {
+      "run_label": "mlmi_joint6_m20_run3",
+      "configuration": {
+        "imputations": 20,
+        "chains": 4,
+        "burn": 2000,
+        "between": 1000,
+        "every": 5,
+        "ridge": 0.0001,
+        "hh_prior": 0.05,
+        "psu_prior": 0.01,
+        "person_prior": 0.5,
+        "max_rhat": 1.01,
+        "min_ess": 400
+      }
+    }
+  },
+  "source_sha256": {
+    "code/stata/multilevel_mi.mata": "bbd4aec9cc8ccd83389f6b2076be52721623fc7056eaff962d4f02a6bbdc0e93",
+    "code/stata/impute_multilevel_mi.do": "9a9ac23a72e164f97e55556f1e14b88058fc61a2478560b2a69928835a116f09",
+    "code/stata/multilevel_mi_collapsed.mata": "76c1a7f0514065e03be92ba82a0fba44d30eb50a657d4d10937973c1658e75db",
+    "code/stata/scen3_designscore_mi.do": "194fc142cfb351facf3528c35ed46e031efef1a6085cb01339ad7ef6ffa06a47",
+    "code/stata/variance_designscore.mata": "9a26973574fa47a5b04656eabdd96004c328cd9a81c3a2677430772fa9afc0c0",
+    "code/stata/mi_rename_compat.do": "d9b9f4472a88f40e75b7a8c8f673f72a934cde273f4ce150270d3dcbed191022",
+    "code/evaluation/check_multilevel_mi.py": "4b187eed3d238a682f578e1aa256a545d4b7380538af583abaae400c99b84d6b",
+    "code/evaluation/summarize_designscore_mlmi.py": "210b27e33b466fc70932beb20e05594c297a47ec50a3fa39bef3702229bf113d",
+    "code/evaluation/summarize_designscore_mi.py": "0efeb71715446d1112b2417251856d94132bfd0fb96500c908912ef1b691e354",
+    "code/execution/run_designscore_mlmi.py": "5de3de6c66b1435b34c366847cf7a338457119891fbd7dfcf670418752749082"
+  },
+  "source_input_manifests": {
+    "mlmi_joint6_m20_run3": {
+      "path": "provenance/mlmi_joint6_m20_run3_inputs.json",
+      "sha256": "8b6e14af758608a1b9adc85f1634bc2e589465dc17036643b631589d1d677451"
+    },
+    "mlmi_joint6_m20_run4": {
+      "path": "provenance/mlmi_joint6_m20_run4_inputs.json",
+      "sha256": "2058d9c3da94dd5ef88a2f4f79299238f9219974b0f62572cf238de4780e09e8"
+    },
+    "mlmi_joint6_m20_run4r": {
+      "path": "provenance/mlmi_joint6_m20_run4r_inputs.json",
+      "sha256": "1cf050d4c957004ba163f35966e7e2928a1d864129c7f2c80b7c9e04ae89f45c"
+    },
+    "mlmi_joint6_m20_run5": {
+      "path": "provenance/mlmi_joint6_m20_run5_inputs.json",
+      "sha256": "cd3ae90a884cbde1ce7dc9ceee5d7b434ff5005d703df5bf699836686b0f806a"
+    }
+  },
+  "selection_rule": "First completed validated run in supplied order; longer chains only for failed validation, never chosen using estimates"
+}

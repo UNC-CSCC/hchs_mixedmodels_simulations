@@ -1,0 +1,22 @@
+{
+  "created_utc": "2026-10-30T08:05:56.311914+00:00",
+  "new_label": "mlmi_joint6_m20_first100",
+  "current_label": "mi_s1_v2_m5",
+  "first": 1,
+  "last": 100,
+  "selected_five_draws": [
+    1,
+    6,
+    11,
+    16,
+    2
+  ],
+  "selection_rule": "first draw from each of four chains, then second draw of chain 1; fixed before result inspection",
+  "source_hashes": {
+    "summaries\\oct2026\\mi_s1_v2_m5_1_100\\pooled_estimates.csv": "49d142693424c75de569e7f7e82a4ebdca728a4b3429bf660f27c9b8e41541b6",
+    "summaries\\oct2026\\mlmi_joint6_m20_first100_1_100\\pooled_estimates.csv": "e675951f70cdc93ea030c9796e8d166526deb9e6c2b1ef6e630f28fd8b4b4372",
+    "code\\evaluation\\compare_multilevel_with_current_mi.py": "7b054eb1ce72631d8b00f5c4b11ae869e355160f705258eb8078a18b7ad5adab",
+    "provenance\\mlmi_joint6_m20_first100_inputs.json": "57ac9acfb918f11b39125898a8416762ac6f71226ae312e2d3af9283b7b4b1de",
+    "data\\run_artifacts\\mi_s1_v2_m5_covariance_reference_1_100.json": "59aacb3613caaf892e3e0146a006cbc6649632a2b7fc953bf4f12baedc1a427f"
+  }
+}

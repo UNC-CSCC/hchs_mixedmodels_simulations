@@ -1,0 +1,11 @@
+term,n_pairs,mean_designscore_minus_original,paired_difference_mcse,coverage_difference,coverage_difference_mcse
+(Intercept),2,0.0,0.0,0,0.0
+age_strat_new,2,0.0,0.0,0,0.0
+x12,2,0.0,0.0,0,0.0
+x17,2,0.0,0.0,0,0.0
+x18,2,0.0,0.0,0,0.0
+x6,2,0.0,0.0,0,0.0
+y_bmi,2,0.0,0.0,0,0.0
+var_hhid,2,2.9689332860583946,2.3384485852442225,0,0.0
+var_subid,2,-7.2152143825774715,2.071509542181218,0,0.0
+s2,2,0.0,0.0,0,0.0

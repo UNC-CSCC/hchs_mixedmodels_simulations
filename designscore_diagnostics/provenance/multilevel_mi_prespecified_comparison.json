@@ -1,0 +1,13 @@
+{
+  "recorded_utc": "2026-10-29T19:46:02Z",
+  "samples": [1, 100],
+  "current_mi_label": "mi_s1_v2_m5",
+  "multilevel_label": "mlmi_joint6_m20_run3",
+  "multilevel_imputations": 20,
+  "same_completed_data_for_both_analyses": true,
+  "five_imputation_subset": [1, 6, 11, 16, 2],
+  "subset_selection": "First retained draw of each chain, then second draw of chain 1; chosen before multilevel analysis results exist.",
+  "chain_gate": {"max_rhat": 1.01, "min_bulk_ess": 400, "min_tail_ess": 400},
+  "analysis_integration_points": 7,
+  "failed_replicates": "Retain evidence, investigate, and complete all requested replicates before making the final matched comparison; never silently exclude failures."
+}

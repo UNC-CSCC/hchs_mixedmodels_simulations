@@ -1,0 +1,58 @@
+{
+  "run_label": "mlmi_collection_check",
+  "first_replicate": 1,
+  "last_replicate": 2,
+  "n_imputations": 20,
+  "completed_replicates": 2,
+  "created_utc": "2026-10-29T21:35:14.582211+00:00",
+  "replicate_sources": {
+    "1": {
+      "run_label": "mlmi_joint6_m20_run3",
+      "configuration": {
+        "imputations": 20,
+        "chains": 4,
+        "burn": 2000,
+        "between": 1000,
+        "every": 5,
+        "ridge": 0.0001,
+        "hh_prior": 0.05,
+        "psu_prior": 0.01,
+        "person_prior": 0.5,
+        "max_rhat": 1.01,
+        "min_ess": 400
+      }
+    },
+    "2": {
+      "run_label": "mlmi_joint6_m20_run3",
+      "configuration": {
+        "imputations": 20,
+        "chains": 4,
+        "burn": 2000,
+        "between": 1000,
+        "every": 5,
+        "ridge": 0.0001,
+        "hh_prior": 0.05,
+        "psu_prior": 0.01,
+        "person_prior": 0.5,
+        "max_rhat": 1.01,
+        "min_ess": 400
+      }
+    }
+  },
+  "output_sha256": {
+    "data/estimates/oct2026/mlmi_joint6_m20_run3/per_imputation/mi_estimates_1.csv": "b33baef64a90f639e396a1a0dcf33fc7ec5f4fd8bc3f0b501b0829a18225f9e4",
+    "data/estimates/oct2026/mlmi_joint6_m20_run3/pooled/mi_coef_1.csv": "0d742bbe10f9bf1fe6414b61682737399310cda8e4ab9b5118aa890617cbf98f",
+    "data/estimates/oct2026/mlmi_joint6_m20_run3/audits/mi_audit_1.csv": "8aa876fc1cf4ed6f0f005672b8cec3fb63c2bb61b6cbd0a769e5de14a03dea05",
+    "data/estimates/oct2026/mlmi_joint6_m20_run3/sampler/validation_1.json": "8d458e9be493e0e974ae4d5028693bdd04a1785f69877515c10d9f3e60519727",
+    "data/estimates/oct2026/mlmi_joint6_m20_run3/sampler/paired_fit_1.json": "ca8a979a23710e3bb4a6b2e1a134666c4e56f8592e4f8e976d030f5222e22115",
+    "data/estimates/oct2026/mlmi_joint6_m20_run3/imputations/mi_1.dta": "43b3b26386a5eb59e21b02d8303dc6ddbdd4f265747992726cf545d36ef49728",
+    "data/estimates/oct2026/mlmi_joint6_m20_run3/per_imputation/mi_estimates_2.csv": "987dcf378acb82d0e77ee19903c2eef67b910019cd0eae8c6597cde85b5089a4",
+    "data/estimates/oct2026/mlmi_joint6_m20_run3/pooled/mi_coef_2.csv": "59e2b1553440f35d5d75de35858bb18d40bb798921c1ef91d52961136b30668a",
+    "data/estimates/oct2026/mlmi_joint6_m20_run3/audits/mi_audit_2.csv": "4d3d545faca5f4b13024f5d79709c9ac261e2afa0f83bd05b4db341d977e5f78",
+    "data/estimates/oct2026/mlmi_joint6_m20_run3/sampler/validation_2.json": "230defb56e97b10db2cca16e340d7e1ede884452316ae57b41b0c86aa5a8011b",
+    "data/estimates/oct2026/mlmi_joint6_m20_run3/sampler/paired_fit_2.json": "20e0e44fc501b54f39773a43f0cdc1e1190cb10f81097d126c771ccdeb6c77dd",
+    "data/estimates/oct2026/mlmi_joint6_m20_run3/imputations/mi_2.dta": "39e123523efab71fc34c468adf7004f68c5e2c1665a759f6ed0684c4b1eda062"
+  },
+  "collection_code_sha256": "f43388663cec5c4af3253c8e0ba2776618e072f4357de08e33b4a675f682c280",
+  "note": "Same model, priors and M across replicates; some chains extended to meet unchanged convergence criteria. Source data are referenced in place, not copied."
+}

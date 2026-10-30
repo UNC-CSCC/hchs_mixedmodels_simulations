@@ -1,0 +1,26 @@
+{
+  "reason": "Increase retry worker capacity from 3 to 8; preserve interrupted evidence and restart under a fresh label",
+  "time": "2026-10-29T16:30:48.5546549-04:00",
+  "scheduler": {
+    "ProcessId": 23040,
+    "ParentProcessId": 14348,
+    "CommandLine": "\"C:\\Users\\zhaob\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe\" code/execution/complete_designscore_mlmi.py --primary-label mlmi_joint6_m20_run3 --retry-labels mlmi_joint6_m20_run4 mlmi_joint6_m20_run5 --between 2000 4000 --collection-label mlmi_joint6_m20_first100 --workers 3 --first 1 --last 100"
+  },
+  "children": [
+    {
+      "ProcessId": 25768,
+      "ParentProcessId": 23040,
+      "CommandLine": "\"C:\\Program Files\\StataNow19\\StataBE-64.exe\" /e do \"C:\\Users\\zhaob\\OneDrive - University of North Carolina at Chapel Hill\\CSCC\\HCHS\\HCHS Simulations\\hchs_mixedmodels_simulations\\designscore_diagnostics\\.statatmp\\mlmi_joint6_m20_run4\\impute_6.do\""
+    },
+    {
+      "ProcessId": 31236,
+      "ParentProcessId": 23040,
+      "CommandLine": "\"C:\\Program Files\\StataNow19\\StataBE-64.exe\" /e do \"C:\\Users\\zhaob\\OneDrive - University of North Carolina at Chapel Hill\\CSCC\\HCHS\\HCHS Simulations\\hchs_mixedmodels_simulations\\designscore_diagnostics\\.statatmp\\mlmi_joint6_m20_run4\\impute_9.do\""
+    },
+    {
+      "ProcessId": 10276,
+      "ParentProcessId": 23040,
+      "CommandLine": "\"C:\\Program Files\\StataNow19\\StataBE-64.exe\" /e do \"C:\\Users\\zhaob\\OneDrive - University of North Carolina at Chapel Hill\\CSCC\\HCHS\\HCHS Simulations\\hchs_mixedmodels_simulations\\designscore_diagnostics\\.statatmp\\mlmi_joint6_m20_run4\\impute_10.do\""
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "run_label": "mlmi_joint6_m20_run4r",
+  "first_replicate": 14,
+  "last_replicate": 14,
+  "n_imputations": 20,
+  "imputation_model": "Joint six-outcome Gaussian MI with PSU and household random effects; configuration and chain seeds in input manifest",
+  "missingness": "y_gfr and y_bmi masked using miss_ind_mar; baseline 00pct",
+  "pooling": "Rubin rules; identity for fixed effects, log for positive variances; finite-M t degrees of freedom, asymptotic complete-data variance; both methods identical rules",
+  "completed_replicates": 1,
+  "output_sha256": {
+    "data/estimates/oct2026/mlmi_joint6_m20_run4r/per_imputation/mi_estimates_14.csv": "bd3aca54150da5fda36c11d0b88416ba78d7269b2608e99ec4c3c0ea5632e979",
+    "data/estimates/oct2026/mlmi_joint6_m20_run4r/audits/mi_audit_14.csv": "f136da22a8bb51f5a3fa6460b751a675ddfbf39f4264d715b092fa9801721e0e",
+    "data/estimates/oct2026/mlmi_joint6_m20_run4r/pooled/mi_coef_14.csv": "760651254d3553ab86d71847a8acf9457b3aa7d3fbc4b418e661e26c941aa1fb",
+    "data/estimates/oct2026/mlmi_joint6_m20_run4r/imputations/mi_14.dta": "da27361eeb5f6ca3bf4afb531167199317c3f6e5f47d7cb20c5d3d705d291e72"
+  },
+  "source_sha256": {
+    "code/stata/scen3_designscore_mi.do": "194fc142cfb351facf3528c35ed46e031efef1a6085cb01339ad7ef6ffa06a47",
+    "code/stata/mi_rename_compat.do": "d9b9f4472a88f40e75b7a8c8f673f72a934cde273f4ce150270d3dcbed191022",
+    "code/stata/variance_designscore.mata": "9a26973574fa47a5b04656eabdd96004c328cd9a81c3a2677430772fa9afc0c0",
+    "code/evaluation/summarize_designscore_mlmi.py": "210b27e33b466fc70932beb20e05594c297a47ec50a3fa39bef3702229bf113d",
+    "code/execution/run_designscore_mlmi.py": "5de3de6c66b1435b34c366847cf7a338457119891fbd7dfcf670418752749082",
+    "code/stata/multilevel_mi.mata": "bbd4aec9cc8ccd83389f6b2076be52721623fc7056eaff962d4f02a6bbdc0e93",
+    "code/stata/impute_multilevel_mi.do": "9a9ac23a72e164f97e55556f1e14b88058fc61a2478560b2a69928835a116f09",
+    "code/evaluation/check_multilevel_mi.py": "4b187eed3d238a682f578e1aa256a545d4b7380538af583abaae400c99b84d6b",
+    "code/evaluation/summarize_designscore_mi.py": "0efeb71715446d1112b2417251856d94132bfd0fb96500c908912ef1b691e354"
+  },
+  "truth_sha256": "cec4f49977116f0a0df7fc59a0d6f3598320d5ae3cb5885bbb5e02217aa013c8",
+  "multilevel_configuration": {
+    "imputations": 20,
+    "chains": 4,
+    "burn": 2000,
+    "between": 2000,
+    "every": 5,
+    "ridge": 0.0001,
+    "hh_prior": 0.05,
+    "psu_prior": 0.01,
+    "person_prior": 0.5,
+    "max_rhat": 1.01,
+    "min_ess": 400.0
+  },
+  "input_manifest": "provenance/mlmi_joint6_m20_run4r_inputs.json",
+  "input_manifest_sha256": "1cf050d4c957004ba163f35966e7e2928a1d864129c7f2c80b7c9e04ae89f45c"
+}

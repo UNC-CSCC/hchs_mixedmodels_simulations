@@ -1,0 +1,2 @@
+sim_id,status,n_imputations,paired_inputs_verified,max_kkt_error,max_step1_score_error,max_jacobian_condition,mean_missing_v2,mean_missing_v3
+31,OK,20,1,1.6947267e-07,1.4700919e-07,12687.555,0.2996080021627467,0.45748851

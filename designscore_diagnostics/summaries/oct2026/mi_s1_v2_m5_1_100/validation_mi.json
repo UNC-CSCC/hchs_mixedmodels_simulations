@@ -1,0 +1,18 @@
+{
+  "completed_at": "2026-10-29T18:25:25.663535+00:00",
+  "requested_replicates": 100,
+  "completed_replicates": 100,
+  "shared_imputations_verified": 500,
+  "independent_R_recalculation": "PASS",
+  "pooling_unit_tests": "PASS",
+  "input_and_analysis_source_checksums": "PASS",
+  "observed_values_and_MAR_masking": "PASS",
+  "input_log": "logs/oct2026/mi_s1_v2_m5/verify_mi_inputs_1_100.log",
+  "input_log_sha256": "48e1943bffc767ff23d5ed3b6838cbeb41ad9e984a800ff983d8c8ac5399dbd2",
+  "verification_source_sha256": {
+    "code/stata/verify_mi_inputs.do": "44310d1b034afe753ab8897bb81b6572bd9b1e299accc16b628825f6dc4e557f",
+    "code/evaluation/verify_designscore_mi.R": "7945cf079aeacd9c0a0cbf3f71fe8c3e1f25ec1a345e5f9b134d795aca87b8b3",
+    "code/evaluation/test_mi_pooling.py": "bfe85a7d2c854576a8e6315f08bc22ee0e02ca819c991862b1abdab7c4a6689f",
+    "code/execution/finalize_designscore_mi.py": "eea697b126a4f2db07316c9d729af8256e86d1221ae44123ac61159ede15b76f"
+  }
+}

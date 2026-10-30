@@ -1,0 +1,11 @@
+scenario,term_type,term,n_reps,true_value,mean_estimate,empirical_bias,relative_bias,empirical_se,model_se,relative_se_diff,coverage_rate,coverage_emp_se,p_reject_h0,n_expected,n_missing_points,n_valid_intervals,n_missing_intervals,coverage_over_all_requested,bias_mcse,coverage_mcse,n_imputations,pooling_scale,mean_arithmetic_estimate,first_replicate,last_replicate
+scen3_original_mlmi_joint6_oct2026,fixed_effect,(Intercept),0,126.431812464457,,,,,,,,,,1,1,0,1,0.0,,,20,identity,,1,1
+scen3_original_mlmi_joint6_oct2026,fixed_effect,age_strat_new,0,-6.261695576267929,,,,,,,,,,1,1,0,1,0.0,,,20,identity,,1,1
+scen3_original_mlmi_joint6_oct2026,fixed_effect,x12,0,-0.194333093139282,,,,,,,,,,1,1,0,1,0.0,,,20,identity,,1,1
+scen3_original_mlmi_joint6_oct2026,fixed_effect,x17,0,-5.588302147816552,,,,,,,,,,1,1,0,1,0.0,,,20,identity,,1,1
+scen3_original_mlmi_joint6_oct2026,fixed_effect,x18,0,-1.021143698171707,,,,,,,,,,1,1,0,1,0.0,,,20,identity,,1,1
+scen3_original_mlmi_joint6_oct2026,fixed_effect,x6,0,-0.5504781818729462,,,,,,,,,,1,1,0,1,0.0,,,20,identity,,1,1
+scen3_original_mlmi_joint6_oct2026,fixed_effect,y_bmi,0,-0.007314772519823,,,,,,,,,,1,1,0,1,0.0,,,20,identity,,1,1
+scen3_original_mlmi_joint6_oct2026,variance_component,var_hhid,0,22.73806440489054,,,,,,,,,,1,1,0,1,0.0,,,20,log,,1,1
+scen3_original_mlmi_joint6_oct2026,variance_component,var_subid,0,175.1743029589018,,,,,,,,,,1,1,0,1,0.0,,,20,log,,1,1
+scen3_original_mlmi_joint6_oct2026,variance_component,s2,0,95.08983887931275,,,,,,,,,,1,1,0,1,0.0,,,20,log,,1,1

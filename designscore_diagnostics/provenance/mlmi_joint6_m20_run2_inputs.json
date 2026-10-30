@@ -1,0 +1,45 @@
+{
+  "model": "joint6_psu_household_v1",
+  "sampler": "gibbs_noncentered_interweaving_v2",
+  "configuration": {
+    "imputations": 20,
+    "chains": 4,
+    "burn": 1000,
+    "between": 1000,
+    "every": 5,
+    "ridge": 0.0001,
+    "hh_prior": 0.05,
+    "psu_prior": 0.01,
+    "person_prior": 0.5,
+    "max_rhat": 1.01,
+    "min_ess": 400
+  },
+  "sample_directory": "C:\\Users\\zhaob\\OneDrive - University of North Carolina at Chapel Hill\\CSCC\\HCHS\\HCHS Simulations\\data\\Oct2026\\sample_miss00pct",
+  "source_sha256": {
+    "code/stata/multilevel_mi.mata": "fc0c77d4d05109e34d4f23b4d0fd187d197879ac05268d0277af1d4d25a2dd69",
+    "code/stata/impute_multilevel_mi.do": "2ae15a730145d06f6e6c80e5e2a1fe6db465122a8209d771dd7d1a23be11f1f4",
+    "code/stata/scen3_designscore_mi.do": "194fc142cfb351facf3528c35ed46e031efef1a6085cb01339ad7ef6ffa06a47",
+    "code/stata/variance_designscore.mata": "9a26973574fa47a5b04656eabdd96004c328cd9a81c3a2677430772fa9afc0c0",
+    "code/stata/mi_rename_compat.do": "d9b9f4472a88f40e75b7a8c8f673f72a934cde273f4ce150270d3dcbed191022",
+    "code/evaluation/check_multilevel_mi.py": "4b187eed3d238a682f578e1aa256a545d4b7380538af583abaae400c99b84d6b",
+    "code/evaluation/summarize_designscore_mlmi.py": "210b27e33b466fc70932beb20e05594c297a47ec50a3fa39bef3702229bf113d",
+    "code/evaluation/summarize_designscore_mi.py": "0efeb71715446d1112b2417251856d94132bfd0fb96500c908912ef1b691e354",
+    "code/execution/run_designscore_mlmi.py": "f7860e4e0332819b1aedc0cb9ab9ef826c757e32565eb69777e64558570a5dbc"
+  },
+  "frame_sha256": "3b5c7195b908447b117c775e63d8bea66d02911b855bbd29672f7f24f22f80a3",
+  "counts_sha256": "e3544bd904b38053306fbad81365981ee10064ad75ed2e0da82c06d010065221",
+  "truth_sha256": "cec4f49977116f0a0df7fc59a0d6f3598320d5ae3cb5885bbb5e02217aa013c8",
+  "samples": {
+    "1": {
+      "md5": "BF351149678CEA5345F0DCA76589B691",
+      "sha256": "963c4cc1ef004d3ade4d18f1a4be042526cc54bb3d37a765db950dfc14afba1b",
+      "mi_seed": 500001,
+      "chain_seeds": [
+        1500001,
+        2500001,
+        3500001,
+        4500001
+      ]
+    }
+  }
+}

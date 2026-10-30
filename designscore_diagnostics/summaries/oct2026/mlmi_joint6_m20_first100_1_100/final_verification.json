@@ -1,0 +1,36 @@
+{
+  "completed_utc": "2026-10-30T08:05:56.322918+00:00",
+  "run_label": "mlmi_joint6_m20_first100",
+  "first": 1,
+  "last": 100,
+  "imputations_per_replicate": 20,
+  "completed_replicates": 100,
+  "identical_imputations_verified": true,
+  "independent_R_recalculation": "PASS",
+  "unchanged_legacy_files_verified": 469,
+  "source_sha256": {
+    "code\\execution\\finalize_designscore_mlmi.py": "ba42077bb7488f293b610f710c8086fbacd9bed0138709a0f31bbb00146dc1a5",
+    "code\\evaluation\\verify_designscore_mlmi.R": "b644090a251c763685a391e07892a4d08b70d5b83594ecb471b89717f7244f89",
+    "code\\evaluation\\compare_multilevel_with_current_mi.py": "7b054eb1ce72631d8b00f5c4b11ae869e355160f705258eb8078a18b7ad5adab",
+    "provenance\\mlmi_joint6_m20_first100_inputs.json": "57ac9acfb918f11b39125898a8416762ac6f71226ae312e2d3af9283b7b4b1de",
+    "code\\evaluation\\collect_designscore_mlmi.py": "f43388663cec5c4af3253c8e0ba2776618e072f4357de08e33b4a675f682c280",
+    "code\\execution\\complete_designscore_mlmi.py": "d4d23c49543085056304de0b0c68d43db094a3451f91060f89aa4c47d17c7496"
+  },
+  "summary_sha256": {
+    "audit_mi.csv": "94d0edb35b5cca3788faf53087c3521248ce56ab707364758116af4ca8261f7d",
+    "chain_diagnostics_summary.csv": "adbeec08e1feaaa873e99fcbdae48c8308c5401eeb58cda59a9b6f1ff40e6269",
+    "comparison_provenance.json": "cdc1692addf6e3f83649a5832406bb42acd32468c01df04fb355a39fd087a918",
+    "comparison_with_current_mi.csv": "d543c39f93ee05d154ce5d2877516b8134ecbaaab4ca2738bc1bd3045c1fda85",
+    "COMPARISON_WITH_CURRENT_MI.md": "064058be29f12f2604ee401210a051a06848706b6d1d4654af618360cb47f96a",
+    "covariance_preservation.csv": "0ea44dc9e599c85dc08c98484b5d59929ec44790e468166e09fe4c298a8029a8",
+    "coverage_scen3_designscore_mi.csv": "4035d07ea808758a2681554c36fcbbd6047ffb299f5e18efb88871eecf32c487",
+    "coverage_scen3_original_mi.csv": "4380c9cefb2f48841453990c9506288ab8f26e26d04fab7996fde61c21818783",
+    "independent_R_verification.txt": "6798e5aa7b1f668635bc3d46043c6b87a0b68d22a7475268f76bc9d97450bd3b",
+    "paired_changes_from_current_mi.csv": "941f9a8f3639688d62c355aefbb41d2f3f79e3531dfcd268afe4892466f10835",
+    "paired_comparison.csv": "9dc630468448b0a2f94bd695de10691a831ded8cab7711de83a6c7556c2bc66a",
+    "pooled_estimates.csv": "e675951f70cdc93ea030c9796e8d166526deb9e6c2b1ef6e630f28fd8b4b4372",
+    "pooled_multilevel_m5_sensitivity.csv": "f58d4367bab4683a1a0f9ebc9f706c0f20a464e29311c7d685d5277650192c51",
+    "provenance_mi.json": "ac5449e9477d039e287afb4c39ed7aa221e5cfededee34fef4b4f45532b9595c",
+    "replicate_source_runs.csv": "93b754fe812af865426ad0ae1b9e955c743d0b74a112170863a51f5b3f8f283b"
+  }
+}
